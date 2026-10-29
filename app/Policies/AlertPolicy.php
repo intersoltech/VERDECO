@@ -9,26 +9,26 @@ class AlertPolicy
 {
     public function viewAny(User $user): bool
     {
-        return $user->can('view-any-alert') || $user->can('view-alert');
+        return $user->hasRole('admin') || $user->hasPermission('alerts.read');
     }
 
     public function view(User $user, Alert $alert): bool
     {
-        return $user->can('view-alert') || $user->plants()->whereKey($alert->plant_id)->exists();
+        return $user->canAccessPlant($alert->plant);
     }
 
     public function create(User $user): bool
     {
-        return $user->can('create-alert');
+        return $user->hasPermission('alerts.manage');
     }
 
     public function update(User $user, Alert $alert): bool
     {
-        return $user->can('update-alert') || $user->plants()->whereKey($alert->plant_id)->exists();
+        return $user->hasPermission('alerts.manage') && $user->canAccessPlant($alert->plant);
     }
 
     public function delete(User $user, Alert $alert): bool
     {
-        return $user->can('delete-alert');
+        return $user->hasPermission('alerts.manage') && $user->canAccessPlant($alert->plant);
     }
 }

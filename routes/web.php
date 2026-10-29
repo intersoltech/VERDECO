@@ -9,9 +9,10 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
 
 Route::get('/', function () {
+    $user = auth()->user();
     $tablesPresent = Schema::hasTable('plants') && Schema::hasTable('alerts') && Schema::hasTable('cost_incidents');
 
-    if (! $tablesPresent) {
+    if (! $user || ! $tablesPresent) {
         return view('verdeco-home', [
             'plantCount' => 0,
             'alertCount' => 0,
@@ -21,13 +22,23 @@ Route::get('/', function () {
         ]);
     }
 
-    $plantCount = Plant::query()->count();
-    $alertCount = Alert::query()->where('status', 'open')->count();
-    $incidentCount = CostIncident::query()->where('status', '!=', 'closed')->count();
-    $plantSummaries = (new PlantCostSummaryService())->forOrganization();
-    $recentAlerts = Alert::query()
+    $plantIds = $user->hasRole('admin') ? null : $user->accessiblePlantIds();
+    $plantQuery = Plant::query();
+    $alertQuery = Alert::query()->where('status', 'open');
+    $incidentQuery = CostIncident::query()->where('status', '!=', 'closed');
+
+    if ($plantIds !== null) {
+        $plantQuery->whereKey($plantIds);
+        $alertQuery->whereIn('plant_id', $plantIds);
+        $incidentQuery->whereIn('plant_id', $plantIds);
+    }
+
+    $plantCount = $plantQuery->count();
+    $alertCount = $alertQuery->count();
+    $incidentCount = $incidentQuery->count();
+    $plantSummaries = (new PlantCostSummaryService())->forOrganization($user);
+    $recentAlerts = (clone $alertQuery)
         ->with('plant')
-        ->where('status', 'open')
         ->orderByDesc('triggered_at')
         ->limit(4)
         ->get();
@@ -55,9 +66,21 @@ Route::get('/api/ops-summary', function () {
         ]);
     }
 
-    $plants = Plant::query()
-        ->withCount(['costIncidents as unresolved_incidents' => fn ($query) => $query->where('status', '!=', 'closed')])
-        ->get()
+    $user = auth()->user();
+    $plantIds = $user->hasRole('admin') ? null : $user->accessiblePlantIds();
+    $plantQuery = Plant::query()
+        ->withCount(['costIncidents as unresolved_incidents' => fn ($query) => $query->where('status', '!=', 'closed')]);
+
+    $alertQuery = Alert::query()->where('status', 'open');
+    $incidentQuery = CostIncident::query()->where('status', '!=', 'closed');
+
+    if ($plantIds !== null) {
+        $plantQuery->whereKey($plantIds);
+        $alertQuery->whereIn('plant_id', $plantIds);
+        $incidentQuery->whereIn('plant_id', $plantIds);
+    }
+
+    $plants = $plantQuery->get()
         ->map(fn (Plant $plant) => [
             'id' => $plant->id,
             'name' => $plant->name,
@@ -73,11 +96,11 @@ Route::get('/api/ops-summary', function () {
         'plants' => $plants,
         'totals' => [
             'plants' => count($plants),
-            'active_alerts' => Schema::hasTable('alerts') ? Alert::query()->where('status', 'open')->count() : 0,
-            'open_incidents' => Schema::hasTable('cost_incidents') ? CostIncident::query()->where('status', '!=', 'closed')->count() : 0,
+            'active_alerts' => Schema::hasTable('alerts') ? $alertQuery->count() : 0,
+            'open_incidents' => Schema::hasTable('cost_incidents') ? $incidentQuery->count() : 0,
         ],
     ]);
-});
+})->middleware('auth');
 
 Route::get('/api/alerts', function () {
     if (! Schema::hasTable('alerts')) {
@@ -87,11 +110,16 @@ Route::get('/api/alerts', function () {
         ]);
     }
 
-    $alerts = Alert::query()
+    $user = auth()->user();
+    $alertQuery = Alert::query()
         ->with(['plant', 'acknowledgedBy', 'resolvedBy'])
-        ->where('status', 'open')
-        ->orderByDesc('triggered_at')
-        ->get()
+        ->where('status', 'open');
+
+    if (! $user->hasRole('admin')) {
+        $alertQuery->whereIn('plant_id', $user->accessiblePlantIds());
+    }
+
+    $alerts = $alertQuery->orderByDesc('triggered_at')->get()
         ->map(fn (Alert $alert) => [
             'id' => $alert->id,
             'plant' => $alert->plant?->code ?? 'Unknown plant',
@@ -110,4 +138,4 @@ Route::get('/api/alerts', function () {
         'count' => count($alerts),
         'alerts' => $alerts,
     ]);
-});
+})->middleware('auth');

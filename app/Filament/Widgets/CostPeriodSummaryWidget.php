@@ -20,10 +20,17 @@ class CostPeriodSummaryWidget extends BaseWidget
             ];
         }
 
-        $openPeriods = CostPeriod::query()->where('status', 'open')->count();
-        $approvedPeriods = CostPeriod::query()->where('status', 'approved')->count();
-        $closedPeriods = CostPeriod::query()->where('status', 'closed')->count();
-        $varianceTotal = (float) CostPeriod::query()->sum('variance_cost');
+        $user = auth()->user();
+        $query = CostPeriod::query();
+
+        if (! $user?->hasRole('admin')) {
+            $query->whereIn('plant_id', $user?->accessiblePlantIds() ?? []);
+        }
+
+        $openPeriods = (clone $query)->where('status', 'open')->count();
+        $approvedPeriods = (clone $query)->where('status', 'approved')->count();
+        $closedPeriods = (clone $query)->where('status', 'closed')->count();
+        $varianceTotal = (float) (clone $query)->sum('variance_cost');
 
         return [
             Stat::make('Open periods', (string) $openPeriods)

@@ -9,26 +9,26 @@ class PlantPolicy
 {
     public function viewAny(User $user): bool
     {
-        return $user->can('view-any-plant') || $user->can('view-plant');
+        return $user->hasRole('admin') || $user->hasPermission('plants.read');
     }
 
     public function view(User $user, Plant $plant): bool
     {
-        return $user->can('view-plant') || $user->plants()->whereKey($plant->getKey())->exists();
+        return $user->canAccessPlant($plant);
     }
 
     public function create(User $user): bool
     {
-        return $user->can('create-plant');
+        return $user->hasPermission('plants.manage');
     }
 
     public function update(User $user, Plant $plant): bool
     {
-        return $user->can('update-plant') || $user->plants()->whereKey($plant->getKey())->exists();
+        return $user->hasPermission('plants.manage') && $user->canAccessPlant($plant);
     }
 
     public function delete(User $user, Plant $plant): bool
     {
-        return $user->can('delete-plant');
+        return $user->hasPermission('plants.manage') && $user->canAccessPlant($plant);
     }
 }

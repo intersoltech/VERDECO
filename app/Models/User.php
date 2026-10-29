@@ -4,16 +4,17 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Domain\Organization\Models\Plant;
-use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Collection;
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Panel;
 
-class User extends Authenticatable
+class User extends Authenticatable implements FilamentUser
 {
-    /** @use HasFactory<UserFactory> */
+    /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
     /**
@@ -113,11 +114,12 @@ class User extends Authenticatable
             return true;
         }
 
-        if ($this->plants()->count() === 0) {
-            return true;
-        }
-
         return $this->plants()->whereKey($plant->getKey())->exists();
+    }
+
+    public function canAccessPanel(Panel $panel): bool
+    {
+        return $this->hasAnyRole(['admin', 'plant_manager', 'plant_supervisor', 'plant_operator']);
     }
 
     /**
@@ -162,6 +164,16 @@ class User extends Authenticatable
                 'update-alert-rule',
                 'plans.read',
                 'plants.read',
+                'production-lines.read',
+                'production-lines.manage',
+                'production-batches.read',
+                'production-batches.manage',
+                'costs.read',
+                'costs.manage',
+                'suppliers.read',
+                'suppliers.manage',
+                'cost-periods.read',
+                'cost-periods.manage',
                 'costs.read',
                 'costs.manage',
                 'incidents.read',
@@ -175,6 +187,10 @@ class User extends Authenticatable
                 'view-alert',
                 'view-alert-rule',
                 'plants.read',
+                'production-lines.read',
+                'production-batches.read',
+                'suppliers.read',
+                'cost-periods.read',
                 'costs.read',
                 'incidents.read',
                 'alerts.read',
@@ -182,6 +198,10 @@ class User extends Authenticatable
             'plant_operator' => [
                 'view-plant',
                 'plants.read',
+                'production-lines.read',
+                'production-batches.read',
+                'suppliers.read',
+                'cost-periods.read',
                 'costs.read',
                 'incidents.read',
                 'alerts.read',

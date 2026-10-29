@@ -10,9 +10,16 @@ class OpenAlertsWidget extends BaseWidget
 {
     protected function getStats(): array
     {
-        $openAlerts = Alert::query()->where('status', 'open')->count();
-        $highAlerts = Alert::query()->where('status', 'open')->where('severity', 'high')->count();
-        $criticalAlerts = Alert::query()->where('status', 'open')->where('severity', 'critical')->count();
+        $user = auth()->user();
+        $query = Alert::query()->where('status', 'open');
+
+        if (! $user?->hasRole('admin')) {
+            $query->whereIn('plant_id', $user?->accessiblePlantIds() ?? []);
+        }
+
+        $openAlerts = (clone $query)->count();
+        $highAlerts = (clone $query)->where('severity', 'high')->count();
+        $criticalAlerts = (clone $query)->where('severity', 'critical')->count();
 
         return [
             Stat::make('Open alerts', (string) $openAlerts)

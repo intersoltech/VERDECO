@@ -50,13 +50,30 @@ class OperationsDashboard extends BaseDashboard
     public function getViewData(): array
     {
         $user = auth()->user();
-        $plants = Plant::query()->count();
-        $openAlerts = Alert::query()->where('status', 'open')->count();
-        $openIncidents = CostIncident::query()->where('status', '!=', 'closed')->count();
+        $plantIds = $user?->hasRole('admin') ? null : ($user?->accessiblePlantIds() ?? collect());
+
+        $plantQuery = Plant::query();
+        $alertQuery = Alert::query()->where('status', 'open');
+        $incidentQuery = CostIncident::query()->where('status', '!=', 'closed');
+
+        if ($plantIds !== null) {
+            $plantQuery->whereKey($plantIds);
+            $alertQuery->whereIn('plant_id', $plantIds);
+            $incidentQuery->whereIn('plant_id', $plantIds);
+        }
+
+        $plants = $plantQuery->count();
+        $openAlerts = $alertQuery->count();
+        $openIncidents = $incidentQuery->count();
 
         $hasCostPeriodsTable = Schema::hasTable('cost_periods');
-        $openPeriods = $hasCostPeriodsTable ? CostPeriod::query()->where('status', 'open')->count() : 0;
-        $approvedPeriods = $hasCostPeriodsTable ? CostPeriod::query()->where('status', 'approved')->count() : 0;
+        $periodQuery = CostPeriod::query();
+        if ($plantIds !== null) {
+            $periodQuery->whereIn('plant_id', $plantIds);
+        }
+
+        $openPeriods = $hasCostPeriodsTable ? (clone $periodQuery)->where('status', 'open')->count() : 0;
+        $approvedPeriods = $hasCostPeriodsTable ? (clone $periodQuery)->where('status', 'approved')->count() : 0;
 
         return [
             'userRole' => $user?->role ?? 'guest',

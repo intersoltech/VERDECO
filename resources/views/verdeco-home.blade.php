@@ -130,11 +130,8 @@
                     </div>
 
                     <div class="rounded-2xl border border-amber-500/30 bg-amber-500/5 p-5">
-                        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-amber-300">Demo access</p>
-                        <div class="mt-4 space-y-2 text-sm text-slate-200">
-                            <p><span class="text-slate-400">Email:</span> admin@verdeco.local</p>
-                            <p><span class="text-slate-400">Password:</span> password</p>
-                        </div>
+                        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-amber-300">Secure operations access</p>
+                        <p class="mt-3 text-sm text-slate-200">Sign in with your assigned account to access plant operations.</p>
                         <a href="/admin/login" class="mt-4 inline-flex w-full items-center justify-center rounded-xl border border-amber-400/60 bg-amber-400/10 px-4 py-3 text-sm font-semibold text-amber-200 transition hover:bg-amber-400/20">
                             Go to admin login
                         </a>

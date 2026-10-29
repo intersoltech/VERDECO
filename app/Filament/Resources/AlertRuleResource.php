@@ -25,9 +25,9 @@ class AlertRuleResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    protected static function permissionKey(): string
+    protected static function permissionArea(): string
     {
-        return 'view-alert-rule';
+        return 'alerts';
     }
 
     public static function form(Form $form): Form
@@ -39,7 +39,7 @@ class AlertRuleResource extends Resource
                     ->schema([
                         Forms\Components\Select::make('plant_id')
                             ->label('Plant scope')
-                            ->relationship('plant', 'name')
+                            ->relationship('plant', 'name', modifyQueryUsing: fn ($query) => static::scopePlantOptions($query))
                             ->searchable()
                             ->preload()
                             ->nullable()

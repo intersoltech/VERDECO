@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services\Costing;
 
 use App\Domain\Organization\Models\Plant;
+use App\Models\User;
 
 final class PlantCostSummaryService
 {
@@ -42,11 +43,16 @@ final class PlantCostSummaryService
     /**
      * @return array<int, array<string, float|int|string>>
      */
-    public function forOrganization(): array
+    public function forOrganization(?User $user = null): array
     {
         $summaries = [];
+        $plants = Plant::query()->with('costIncidents');
 
-        foreach (Plant::query()->with('costIncidents')->get() as $plant) {
+        if ($user !== null && ! $user->hasRole('admin')) {
+            $plants->whereKey($user->accessiblePlantIds());
+        }
+
+        foreach ($plants->get() as $plant) {
             $summaries[] = $this->forPlant($plant);
         }
 

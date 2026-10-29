@@ -25,9 +25,9 @@ class PlantResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    protected static function permissionKey(): string
+    protected static function permissionArea(): string
     {
-        return 'view-plant';
+        return 'plants';
     }
 
     public static function form(Form $form): Form

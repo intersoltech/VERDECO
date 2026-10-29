@@ -34,7 +34,14 @@ class SendAlertDigest extends Command
             return self::SUCCESS;
         }
 
-        Notification::route('mail', 'admin@verdeco.local')
+        $recipient = config('services.verdeco.alert_digest_email');
+        if (! is_string($recipient) || trim($recipient) === '') {
+            $this->error('Configure ALERT_DIGEST_EMAIL before sending alert digests.');
+
+            return self::FAILURE;
+        }
+
+        Notification::route('mail', $recipient)
             ->notify(new AlertDigestNotification($alerts));
 
         $this->info(sprintf('Sent digest for %d open alert(s).', count($alerts)));

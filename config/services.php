@@ -35,4 +35,8 @@ return [
         ],
     ],
 
+    'verdeco' => [
+        'alert_digest_email' => env('ALERT_DIGEST_EMAIL'),
+    ],
+
 ];

@@ -34,8 +34,13 @@ class VerdecoDemoSeeder extends Seeder
             [
                 'name' => 'Verdeco Admin',
                 'password' => Hash::make('password'),
+                'role' => 'admin',
             ]
         );
+
+        if (! $user->hasRole('admin')) {
+            $user->forceFill(['role' => 'admin'])->save();
+        }
 
         $plants = [
             [

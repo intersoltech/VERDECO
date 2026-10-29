@@ -10,6 +10,7 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 
 class CostPeriodResource extends Resource
 {
@@ -23,9 +24,14 @@ class CostPeriodResource extends Resource
 
     protected static ?string $navigationLabel = 'Cost periods';
 
-    protected static function permissionKey(): string
+    protected static function permissionArea(): string
     {
-        return 'view-cost-period';
+        return 'cost-periods';
+    }
+
+    protected static function isRecordEditable(Model $record): bool
+    {
+        return $record->status === 'open';
     }
 
     public static function form(Form $form): Form
@@ -35,17 +41,12 @@ class CostPeriodResource extends Resource
                 Forms\Components\Section::make('Period details')
                     ->schema([
                         Forms\Components\Select::make('plant_id')
-                            ->relationship('plant', 'name')
+                            ->relationship('plant', 'name', modifyQueryUsing: fn ($query) => static::scopePlantOptions($query))
                             ->searchable()
                             ->preload()
                             ->required(),
                         Forms\Components\DatePicker::make('period_start')->required(),
                         Forms\Components\DatePicker::make('period_end')->required(),
-                        Forms\Components\Select::make('status')->options([
-                            'open' => 'Open',
-                            'approved' => 'Approved',
-                            'closed' => 'Closed',
-                        ])->default('open')->required(),
                         Forms\Components\TextInput::make('actual_cost')->numeric()->default(0)->required(),
                         Forms\Components\TextInput::make('standard_cost')->numeric()->default(0)->required(),
                         Forms\Components\TextInput::make('variance_cost')->numeric()->default(0)->required(),
@@ -73,6 +74,9 @@ class CostPeriodResource extends Resource
                 Tables\Columns\TextColumn::make('standard_cost')->money('USD')->sortable(),
                 Tables\Columns\TextColumn::make('variance_cost')->money('USD')->sortable(),
                 Tables\Columns\TextColumn::make('output_kg')->label('Output kg')->sortable(),
+                Tables\Columns\TextColumn::make('approvedBy.name')->label('Approved by')->toggleable(),
+                Tables\Columns\TextColumn::make('closedBy.name')->label('Closed by')->toggleable(),
+                Tables\Columns\TextColumn::make('reopenedBy.name')->label('Reopened by')->toggleable(),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('status')->options([
@@ -86,24 +90,33 @@ class CostPeriodResource extends Resource
                     ->label('Approve')
                     ->icon('heroicon-o-check-circle')
                     ->color('info')
-                    ->visible(fn (CostPeriod $record): bool => $record->status === 'open')
+                    ->requiresConfirmation()
+                    ->visible(fn (CostPeriod $record): bool => $record->status === 'open' && auth()->user()?->hasPermission('cost-periods.manage'))
                     ->action(fn (CostPeriod $record) => $record->approve(auth()->user())),
                 Tables\Actions\Action::make('close')
                     ->label('Close')
                     ->icon('heroicon-o-lock-closed')
                     ->color('success')
-                    ->visible(fn (CostPeriod $record): bool => in_array($record->status, ['open', 'approved'], true))
+                    ->requiresConfirmation()
+                    ->visible(fn (CostPeriod $record): bool => $record->status === 'approved' && auth()->user()?->hasPermission('cost-periods.manage'))
                     ->action(fn (CostPeriod $record) => $record->close(auth()->user())),
                 Tables\Actions\Action::make('reopen')
                     ->label('Reopen')
                     ->icon('heroicon-o-arrow-path')
                     ->color('warning')
-                    ->visible(fn (CostPeriod $record): bool => $record->status === 'closed')
+                    ->requiresConfirmation()
+                    ->visible(fn (CostPeriod $record): bool => $record->status === 'closed' && auth()->user()?->hasPermission('cost-periods.manage'))
                     ->action(fn (CostPeriod $record) => $record->reopen(auth()->user())),
+                Tables\Actions\Action::make('history')
+                    ->label('History')
+                    ->icon('heroicon-o-clock')
+                    ->modalHeading('Cost period lifecycle history')
+                    ->modalSubmitAction(false)
+                    ->modalCancelActionLabel('Close')
+                    ->modalContent(fn (CostPeriod $record) => view('filament.cost-period-history', [
+                        'events' => $record->events()->get(),
+                    ])),
                 Tables\Actions\EditAction::make(),
-            ])
-            ->bulkActions([
-                Tables\Actions\DeleteBulkAction::make(),
             ]);
     }
 

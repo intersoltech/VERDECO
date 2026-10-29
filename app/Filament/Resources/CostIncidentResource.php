@@ -23,9 +23,9 @@ class CostIncidentResource extends Resource
 
     protected static ?string $navigationLabel = 'Incidents';
 
-    protected static function permissionKey(): string
+    protected static function permissionArea(): string
     {
-        return 'view-incident';
+        return 'incidents';
     }
 
     public static function form(Form $form): Form
@@ -35,7 +35,7 @@ class CostIncidentResource extends Resource
                 Forms\Components\Section::make('Incident details')
                     ->schema([
                         Forms\Components\Select::make('plant_id')
-                            ->relationship('plant', 'name')
+                            ->relationship('plant', 'name', modifyQueryUsing: fn ($query) => static::scopePlantOptions($query))
                             ->searchable()
                             ->preload()
                             ->required(),

@@ -15,11 +15,15 @@ class PlantPerformanceTableWidget extends BaseWidget
     public function table(Table $table): Table
     {
         $summaryService = new PlantCostSummaryService();
+        $user = auth()->user();
+        $query = Plant::query()->select('*');
+
+        if (! $user?->hasRole('admin')) {
+            $query->whereKey($user?->accessiblePlantIds() ?? []);
+        }
 
         return $table
-            ->query(
-                Plant::query()->select('*')
-            )
+            ->query($query)
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->label('Plant')

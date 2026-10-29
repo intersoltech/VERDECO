@@ -72,6 +72,8 @@ class AdminPanelProvider extends PanelProvider
                 \App\Filament\Resources\PlantResource::class,
                 \App\Filament\Resources\ProductionLineResource::class,
                 \App\Filament\Resources\SupplierResource::class,
+                \App\Filament\Resources\ProductionBatchResource::class,
+                \App\Filament\Resources\DailyProductionSummaryResource::class,
                 \App\Filament\Resources\CostIncidentResource::class,
                 \App\Filament\Resources\CostPeriodResource::class,
                 \App\Filament\Resources\AlertResource::class,

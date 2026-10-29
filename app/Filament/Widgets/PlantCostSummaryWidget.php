@@ -12,10 +12,21 @@ class PlantCostSummaryWidget extends BaseWidget
 {
     protected function getStats(): array
     {
-        $summaries = (new PlantCostSummaryService())->forOrganization();
-        $plantCount = Plant::query()->count();
-        $incidentCount = CostIncident::query()->where('status', '!=', 'closed')->count();
-        $openIncidentCost = CostIncident::query()->where('status', '!=', 'closed')->sum('cash_cost');
+        $user = auth()->user();
+        $plantIds = $user?->hasRole('admin') ? null : ($user?->accessiblePlantIds() ?? collect());
+        $summaries = (new PlantCostSummaryService())->forOrganization($user);
+
+        $plantQuery = Plant::query();
+        $incidentQuery = CostIncident::query()->where('status', '!=', 'closed');
+
+        if ($plantIds !== null) {
+            $plantQuery->whereKey($plantIds);
+            $incidentQuery->whereIn('plant_id', $plantIds);
+        }
+
+        $plantCount = $plantQuery->count();
+        $incidentCount = (clone $incidentQuery)->count();
+        $openIncidentCost = (clone $incidentQuery)->sum('cash_cost');
 
         $varianceTotal = array_reduce($summaries, fn ($carry, $summary) => $carry + (float) ($summary['variance_to_baseline'] ?? 0), 0.0);
         $avgIncidents = $plantCount > 0 ? $incidentCount / $plantCount : 0;

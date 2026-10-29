@@ -19,9 +19,9 @@ class ProductionLineResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-cpu-chip';
 
-    protected static function permissionKey(): string
+    protected static function permissionArea(): string
     {
-        return 'view-production-line';
+        return 'production-lines';
     }
 
     public static function form(Form $form): Form
@@ -29,7 +29,7 @@ class ProductionLineResource extends Resource
         return $form
             ->schema([
                 Forms\Components\Select::make('plant_id')
-                    ->relationship('plant', 'name')
+                    ->relationship('plant', 'name', modifyQueryUsing: fn ($query) => static::scopePlantOptions($query))
                     ->required(),
                 Forms\Components\TextInput::make('name')->required()->maxLength(255),
                 Forms\Components\TextInput::make('code')->required()->maxLength(255),
