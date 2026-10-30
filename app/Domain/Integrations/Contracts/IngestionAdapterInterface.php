@@ -9,7 +9,6 @@ interface IngestionAdapterInterface
     /**
      * Parse raw incoming payload (CSV, JSON, MQTT/SCADA) into standardized reading records.
      *
-     * @param mixed $payload
      * @return array<int, array<string, mixed>>
      */
     public function parse(mixed $payload): array;

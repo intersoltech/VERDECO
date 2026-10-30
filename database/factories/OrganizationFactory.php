@@ -21,7 +21,7 @@ class OrganizationFactory extends Factory
 
         return [
             'name' => $name,
-            'slug' => Str::slug($name) . '-' . fake()->unique()->numberBetween(100, 999),
+            'slug' => Str::slug($name).'-'.fake()->unique()->numberBetween(100, 999),
             'country_code' => 'US',
         ];
     }

@@ -26,7 +26,7 @@ class FactMonthlyVariance extends Model
     ];
 
     protected $casts = [
-        'period_month' => 'date',
+        'period_month' => 'string',
         'actual_cost' => 'decimal:2',
         'standard_cost' => 'decimal:2',
         'total_variance' => 'decimal:2',

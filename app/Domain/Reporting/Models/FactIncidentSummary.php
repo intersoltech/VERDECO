@@ -20,7 +20,7 @@ class FactIncidentSummary extends Model
     ];
 
     protected $casts = [
-        'incident_date' => 'date',
+        'incident_date' => 'string',
         'cash_cost' => 'decimal:2',
         'opportunity_cost' => 'decimal:2',
         'incident_count' => 'integer',

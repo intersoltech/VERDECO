@@ -5,6 +5,7 @@ namespace App\Domain\Quality\Models;
 use App\Domain\Organization\Models\Plant;
 use App\Domain\Production\Models\ProductionBatch;
 use App\Models\User;
+use Database\Factories\BatchQualityResultFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -15,9 +16,9 @@ class BatchQualityResult extends Model
 {
     use HasFactory, LogsActivity;
 
-    protected static function newFactory(): \Database\Factories\BatchQualityResultFactory
+    protected static function newFactory(): BatchQualityResultFactory
     {
-        return \Database\Factories\BatchQualityResultFactory::new();
+        return BatchQualityResultFactory::new();
     }
 
     protected $fillable = [

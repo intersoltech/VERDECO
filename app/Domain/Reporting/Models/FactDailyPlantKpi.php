@@ -28,7 +28,7 @@ class FactDailyPlantKpi extends Model
     ];
 
     protected $casts = [
-        'production_date' => 'date',
+        'production_date' => 'string',
         'input_kg' => 'decimal:4',
         'good_output_kg' => 'decimal:4',
         'yield_percent' => 'decimal:4',

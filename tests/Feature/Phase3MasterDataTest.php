@@ -7,9 +7,9 @@ use App\Domain\Costing\Models\StandardCost;
 use App\Domain\MasterData\Models\Material;
 use App\Domain\MasterData\Models\ProductGrade;
 use App\Domain\MasterData\Models\Unit;
-use App\Domain\Organization\Models\Plant;
-use App\Domain\Production\Models\ProductionLine;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
@@ -19,11 +19,11 @@ uses(RefreshDatabase::class);
 // ---------------------------------------------------------------------------
 
 it('StandardCost model has plant, line, and productGrade relationships', function (): void {
-    $sc = new StandardCost();
+    $sc = new StandardCost;
 
-    expect($sc->plant())->toBeInstanceOf(\Illuminate\Database\Eloquent\Relations\BelongsTo::class);
-    expect($sc->line())->toBeInstanceOf(\Illuminate\Database\Eloquent\Relations\BelongsTo::class);
-    expect($sc->productGrade())->toBeInstanceOf(\Illuminate\Database\Eloquent\Relations\BelongsTo::class);
+    expect($sc->plant())->toBeInstanceOf(BelongsTo::class);
+    expect($sc->line())->toBeInstanceOf(BelongsTo::class);
+    expect($sc->productGrade())->toBeInstanceOf(BelongsTo::class);
 });
 
 // ---------------------------------------------------------------------------
@@ -110,7 +110,7 @@ it('Unit::convert returns same value for identical units', function (): void {
 // ---------------------------------------------------------------------------
 
 it('CostCategory has all required fillable fields', function (): void {
-    $cat = new CostCategory();
+    $cat = new CostCategory;
     $fillable = $cat->getFillable();
 
     expect($fillable)->toContain('tenant_id')
@@ -128,7 +128,7 @@ it('CostCategory has all required fillable fields', function (): void {
 // ---------------------------------------------------------------------------
 
 it('StandardCost has all required fillable fields', function (): void {
-    $sc = new StandardCost();
+    $sc = new StandardCost;
     $fillable = $sc->getFillable();
 
     expect($fillable)->toContain('plant_id')
@@ -148,8 +148,8 @@ it('StandardCost has all required fillable fields', function (): void {
 // ---------------------------------------------------------------------------
 
 it('Material has prices HasMany relationship', function (): void {
-    $material = new Material();
-    expect($material->prices())->toBeInstanceOf(\Illuminate\Database\Eloquent\Relations\HasMany::class);
+    $material = new Material;
+    expect($material->prices())->toBeInstanceOf(HasMany::class);
 });
 
 // ---------------------------------------------------------------------------
@@ -157,7 +157,7 @@ it('Material has prices HasMany relationship', function (): void {
 // ---------------------------------------------------------------------------
 
 it('ProductGrade has quality spec fillable fields', function (): void {
-    $grade = new ProductGrade();
+    $grade = new ProductGrade;
     $fillable = $grade->getFillable();
 
     // Must carry the grade and spec fields

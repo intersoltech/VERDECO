@@ -8,16 +8,18 @@ use App\Domain\Incidents\Models\CostIncident;
 use App\Domain\MasterData\Models\Material;
 use App\Domain\MasterData\Models\ProductGrade;
 use App\Domain\MasterData\Models\Supplier;
+use Database\Factories\OrganizationFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Organization extends Model
 {
-    use \Illuminate\Database\Eloquent\Factories\HasFactory;
+    use HasFactory;
 
-    protected static function newFactory(): \Database\Factories\OrganizationFactory
+    protected static function newFactory(): OrganizationFactory
     {
-        return \Database\Factories\OrganizationFactory::new();
+        return OrganizationFactory::new();
     }
 
     protected $fillable = [

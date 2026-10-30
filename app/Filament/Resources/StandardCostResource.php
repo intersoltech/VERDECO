@@ -54,6 +54,15 @@ class StandardCostResource extends Resource
                         ->required(),
                     Forms\Components\DateTimePicker::make('effective_to')
                         ->nullable(),
+                    Forms\Components\Select::make('status')
+                        ->options([
+                            'draft' => 'Draft',
+                            'pending_approval' => 'Pending Approval',
+                            'approved' => 'Approved',
+                            'rejected' => 'Rejected',
+                        ])
+                        ->default('approved')
+                        ->required(),
                 ])
                 ->columns(3),
 
@@ -101,12 +110,18 @@ class StandardCostResource extends Resource
                 Tables\Columns\TextColumn::make('plant.code')->label('Plant')->sortable(),
                 Tables\Columns\TextColumn::make('productGrade.name')->label('Grade')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('line.name')->label('Line')->default('All Lines')->sortable(),
+                Tables\Columns\TextColumn::make('status')->badge()->color(fn (string $state): string => match ($state) {
+                    'approved' => 'success',
+                    'pending_approval' => 'warning',
+                    'rejected' => 'danger',
+                    default => 'gray',
+                })->sortable(),
                 Tables\Columns\TextColumn::make('standard_yield_percent')->label('Yield %')->numeric(decimalPlaces: 2)->sortable(),
                 Tables\Columns\TextColumn::make('kg_per_hour')->label('kg/hr')->numeric(decimalPlaces: 0)->sortable(),
                 Tables\Columns\TextColumn::make('kwh_per_kg')->label('kWh/kg')->numeric(decimalPlaces: 4)->sortable(),
                 Tables\Columns\TextColumn::make('labor_hours_per_ton')->label('Hrs/Ton')->numeric(decimalPlaces: 2)->sortable(),
                 Tables\Columns\TextColumn::make('effective_from')->dateTime('Y-m-d')->sortable(),
-                Tables\Columns\TextColumn::make('effective_to')->dateTime('Y-m-d')->default('Current')->sortable(),
+                Tables\Columns\TextColumn::make('effective_to')->dateTime('Y-m-d')->placeholder('Current')->sortable(),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Domain\Production\Models\DowntimeEvent;
 use App\Filament\Resources\DowntimeEventResource\Pages;
 use App\Filament\Support\RoleAwareResourceAccess;
+use Carbon\Carbon;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -42,6 +43,7 @@ class DowntimeEventResource extends Resource
                     Forms\Components\Select::make('line_id')
                         ->relationship('line', 'name', modifyQueryUsing: function ($query, Forms\Get $get) {
                             $plantId = $get('plant_id');
+
                             return $plantId ? $query->where('plant_id', $plantId) : $query;
                         })
                         ->searchable()
@@ -75,7 +77,7 @@ class DowntimeEventResource extends Resource
                             $start = $get('start_at');
                             $end = $get('end_at');
                             if ($start && $end) {
-                                $diff = \Carbon\Carbon::parse($start)->diffInMinutes(\Carbon\Carbon::parse($end));
+                                $diff = Carbon::parse($start)->diffInMinutes(Carbon::parse($end));
                                 $set('duration_minutes', (int) $diff);
                             }
                         }),

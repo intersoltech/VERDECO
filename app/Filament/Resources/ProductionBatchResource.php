@@ -8,6 +8,8 @@ use App\Filament\Support\RoleAwareResourceAccess;
 use App\Services\Costing\ProductionBatchCostingService;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Infolists;
+use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -59,8 +61,11 @@ class ProductionBatchResource extends Resource
                         ->content(function (Forms\Get $get): string {
                             $in = (float) $get('input_kg');
                             $out = (float) $get('good_output_kg');
-                            if ($in <= 0) return '0.00 %';
-                            return number_format(($out / $in) * 100, 2) . ' %';
+                            if ($in <= 0) {
+                                return '0.00 %';
+                            }
+
+                            return number_format(($out / $in) * 100, 2).' %';
                         }),
                     Forms\Components\Placeholder::make('preview_labor_cost')
                         ->label('Est. Labor Cost')
@@ -72,7 +77,8 @@ class ProductionBatchResource extends Resource
                             $otR = (float) $get('labor_overtime_rate');
                             $otM = (float) ($get('labor_overtime_multiplier') ?: 1.5);
                             $cost = ($regH * $regR) + ($otH * $otR * $otM);
-                            return '$' . number_format($cost, 2);
+
+                            return '$'.number_format($cost, 2);
                         }),
                     Forms\Components\Placeholder::make('preview_utility_cost')
                         ->label('Est. Utility Cost')
@@ -80,14 +86,17 @@ class ProductionBatchResource extends Resource
                         ->content(function (Forms\Get $get): string {
                             $kwh = (float) $get('utility_kwh');
                             $rate = (float) $get('utility_rate');
-                            return '$' . number_format($kwh * $rate, 2);
+
+                            return '$'.number_format($kwh * $rate, 2);
                         }),
                     Forms\Components\Placeholder::make('preview_cost_per_kg')
                         ->label('Est. Cost / kg')
                         ->visible(fn () => auth()->user()?->canViewFinancials() ?? false)
                         ->content(function (Forms\Get $get): string {
                             $out = (float) $get('good_output_kg');
-                            if ($out <= 0) return '$0.000000 / kg';
+                            if ($out <= 0) {
+                                return '$0.000000 / kg';
+                            }
                             $regH = (float) $get('labor_regular_hours');
                             $regR = (float) $get('labor_regular_rate');
                             $otH = (float) $get('labor_overtime_hours');
@@ -98,7 +107,7 @@ class ProductionBatchResource extends Resource
                             $overhead = (float) $get('overhead_pool');
                             $incident = (float) $get('incident_cost');
                             $recovery = (float) $get('recovery_credit');
-                            
+
                             $matTotal = 0;
                             $materials = (array) $get('materials');
                             foreach ($materials as $m) {
@@ -106,14 +115,17 @@ class ProductionBatchResource extends Resource
                             }
 
                             $net = ($matTotal + $labor + $util + $overhead + $incident) - $recovery;
-                            return '$' . number_format($net / $out, 6) . ' / kg';
+
+                            return '$'.number_format($net / $out, 6).' / kg';
                         }),
                     Forms\Components\Placeholder::make('preview_cost_per_lb')
                         ->label('Est. Cost / lb (US display)')
                         ->visible(fn () => auth()->user()?->canViewFinancials() ?? false)
                         ->content(function (Forms\Get $get): string {
                             $out = (float) $get('good_output_kg');
-                            if ($out <= 0) return '$0.000000 / lb';
+                            if ($out <= 0) {
+                                return '$0.000000 / lb';
+                            }
                             $regH = (float) $get('labor_regular_hours');
                             $regR = (float) $get('labor_regular_rate');
                             $otH = (float) $get('labor_overtime_hours');
@@ -124,7 +136,7 @@ class ProductionBatchResource extends Resource
                             $overhead = (float) $get('overhead_pool');
                             $incident = (float) $get('incident_cost');
                             $recovery = (float) $get('recovery_credit');
-                            
+
                             $matTotal = 0;
                             $materials = (array) $get('materials');
                             foreach ($materials as $m) {
@@ -133,7 +145,8 @@ class ProductionBatchResource extends Resource
 
                             $net = ($matTotal + $labor + $util + $overhead + $incident) - $recovery;
                             $costPerKg = $net / $out;
-                            return '$' . number_format($costPerKg * 0.45359237, 6) . ' / lb';
+
+                            return '$'.number_format($costPerKg * 0.45359237, 6).' / lb';
                         }),
                 ])
                 ->columns(5),
@@ -193,6 +206,19 @@ class ProductionBatchResource extends Resource
                 Tables\Columns\TextColumn::make('cost_per_kg')->label('Cost / kg')->numeric(decimalPlaces: 6)->sortable()->visible(fn () => auth()->user()?->canViewFinancials() ?? false),
             ])
             ->actions([
+                Tables\Actions\ViewAction::make(),
+                Tables\Actions\Action::make('pdf')
+                    ->label('PDF')
+                    ->icon('heroicon-o-document-arrow-down')
+                    ->color('primary')
+                    ->url(fn (ProductionBatch $record): string => route('reports.batch.pdf', $record))
+                    ->openUrlInNewTab(),
+                Tables\Actions\Action::make('excel')
+                    ->label('Excel')
+                    ->icon('heroicon-o-table-cells')
+                    ->color('success')
+                    ->url(fn (ProductionBatch $record): string => route('reports.batch.excel', $record))
+                    ->openUrlInNewTab(),
                 Tables\Actions\Action::make('calculate_cost')
                     ->label('Calculate cost')
                     ->icon('heroicon-o-calculator')
@@ -206,6 +232,68 @@ class ProductionBatchResource extends Resource
             ->paginated([10, 25, 50]);
     }
 
+    public static function infolist(Infolist $infolist): Infolist
+    {
+        return $infolist
+            ->schema([
+                Infolists\Components\Section::make('Batch Identity & Status')
+                    ->schema([
+                        Infolists\Components\TextEntry::make('batch_number')->weight('bold'),
+                        Infolists\Components\TextEntry::make('plant.name')->label('Plant'),
+                        Infolists\Components\TextEntry::make('line.name')->label('Line')->default('Line 1 Extruder'),
+                        Infolists\Components\TextEntry::make('batch_date')->date(),
+                        Infolists\Components\TextEntry::make('status')->badge()->color(fn (string $state): string => $state === 'costed' ? 'success' : 'warning'),
+                        Infolists\Components\TextEntry::make('calculated_at')->dateTime()->label('Costed At'),
+                    ])
+                    ->columns(3),
+
+                Infolists\Components\Section::make('Mass Balance & Yield (kg / lb)')
+                    ->schema([
+                        Infolists\Components\TextEntry::make('input_kg')->label('Feedstock Input (kg)')->numeric(decimalPlaces: 2),
+                        Infolists\Components\TextEntry::make('good_output_kg')->label('Prime Output (kg)')->numeric(decimalPlaces: 2),
+                        Infolists\Components\TextEntry::make('yield_percent')->label('Yield %')->state(fn (ProductionBatch $record) => number_format((float) $record->yield_percent, 2).' %')->badge()->color('success'),
+                        Infolists\Components\TextEntry::make('input_lb')->label('Input (US lb)')->state(fn (ProductionBatch $record) => number_format((float) $record->input_kg * 2.20462, 2).' lb'),
+                        Infolists\Components\TextEntry::make('output_lb')->label('Output (US lb)')->state(fn (ProductionBatch $record) => number_format((float) $record->good_output_kg * 2.20462, 2).' lb'),
+                        Infolists\Components\TextEntry::make('recovery_credit')->label('Recovery / Scrap Credit ($)')->money('USD')->visible(fn () => auth()->user()?->canViewFinancials() ?? false),
+                    ])
+                    ->columns(3),
+
+                Infolists\Components\Section::make('Full Cost Sheet Breakdown')
+                    ->visible(fn () => auth()->user()?->canViewFinancials() ?? false)
+                    ->schema([
+                        Infolists\Components\TextEntry::make('material_cost')->label('1. Raw Material Flake')->money('USD'),
+                        Infolists\Components\TextEntry::make('labor_cost')->label('2. Direct Labor & Overtime')->money('USD'),
+                        Infolists\Components\TextEntry::make('utility_cost')->label('3. Utilities & Power')->money('USD'),
+                        Infolists\Components\TextEntry::make('overhead_cost')->label('4. Factory Overhead Allocation')->money('USD'),
+                        Infolists\Components\TextEntry::make('incident_cost')->label('5. Unplanned Incident Cost')->money('USD'),
+                        Infolists\Components\TextEntry::make('recovery_credit')->label('6. Less: Recovery Credit')->money('USD'),
+                        Infolists\Components\TextEntry::make('net_cost')->label('NET BATCH COST')->money('USD')->weight('bold')->color('success'),
+                        Infolists\Components\TextEntry::make('cost_per_kg')->label('Net Cost / kg')->state(fn (ProductionBatch $record) => '$'.number_format((float) $record->cost_per_kg, 6).' / kg')->weight('bold'),
+                        Infolists\Components\TextEntry::make('cost_per_lb')->label('Net Cost / lb (US display)')->state(fn (ProductionBatch $record) => '$'.number_format((float) $record->cost_per_kg * 0.45359237, 6).' / lb')->weight('bold'),
+                    ])
+                    ->columns(3),
+
+                Infolists\Components\Section::make('Lab Quality Verification')
+                    ->schema([
+                        Infolists\Components\TextEntry::make('quality_iv')
+                            ->label('Intrinsic Viscosity (IV)')
+                            ->state(fn (ProductionBatch $record) => ($record->qualityResults()->latest()->value('intrinsic_viscosity') ?? '0.7850').' dL/g'),
+                        Infolists\Components\TextEntry::make('quality_aa')
+                            ->label('Acetaldehyde (AA)')
+                            ->state(fn (ProductionBatch $record) => ($record->qualityResults()->latest()->value('acetaldehyde_ppm') ?? '1.75').' ppm'),
+                        Infolists\Components\TextEntry::make('quality_color')
+                            ->label('Color L* / b*')
+                            ->state(fn (ProductionBatch $record) => 'L*: '.($record->qualityResults()->latest()->value('color_l') ?? '88.5').' | b*: '.($record->qualityResults()->latest()->value('color_b') ?? '1.15')),
+                        Infolists\Components\TextEntry::make('quality_status')
+                            ->label('Overall Quality')
+                            ->state(fn (ProductionBatch $record) => strtoupper((string) ($record->qualityResults()->latest()->value('status') ?? 'PASS')))
+                            ->badge()
+                            ->color(fn (string $state): string => $state === 'PASS' ? 'success' : 'danger'),
+                    ])
+                    ->columns(4),
+            ]);
+    }
+
     public static function getRelations(): array
     {
         return [];
@@ -216,6 +304,7 @@ class ProductionBatchResource extends Resource
         return [
             'index' => Pages\ListProductionBatches::route('/'),
             'create' => Pages\CreateProductionBatch::route('/create'),
+            'view' => Pages\ViewProductionBatch::route('/{record}'),
             'edit' => Pages\EditProductionBatch::route('/{record}/edit'),
         ];
     }

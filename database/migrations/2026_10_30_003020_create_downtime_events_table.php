@@ -22,6 +22,7 @@ return new class extends Migration
             $table->decimal('lost_production_kg', 18, 4)->default(0);
             $table->text('description')->nullable();
             $table->text('resolution_notes')->nullable();
+            $table->text('notes')->nullable();
             $table->unsignedBigInteger('reported_by')->nullable();
             $table->timestamps();
 

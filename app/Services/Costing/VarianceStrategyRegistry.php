@@ -21,12 +21,12 @@ final class VarianceStrategyRegistry
 
     public function __construct()
     {
-        $this->register(new MaterialPriceVarianceStrategy());
-        $this->register(new MaterialUsageVarianceStrategy());
-        $this->register(new LaborRateVarianceStrategy());
-        $this->register(new LaborEfficiencyVarianceStrategy());
-        $this->register(new UtilityEfficiencyVarianceStrategy());
-        $this->register(new OverheadVolumeVarianceStrategy());
+        $this->register(new MaterialPriceVarianceStrategy);
+        $this->register(new MaterialUsageVarianceStrategy);
+        $this->register(new LaborRateVarianceStrategy);
+        $this->register(new LaborEfficiencyVarianceStrategy);
+        $this->register(new UtilityEfficiencyVarianceStrategy);
+        $this->register(new OverheadVolumeVarianceStrategy);
     }
 
     public function register(VarianceStrategyInterface $strategy): self

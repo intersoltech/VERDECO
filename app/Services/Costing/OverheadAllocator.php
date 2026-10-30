@@ -7,7 +7,7 @@ namespace App\Services\Costing;
 final class OverheadAllocator
 {
     public function __construct(
-        private readonly AllocationStrategyRegistry $registry = new AllocationStrategyRegistry()
+        private readonly AllocationStrategyRegistry $registry = new AllocationStrategyRegistry
     ) {}
 
     /**

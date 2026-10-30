@@ -9,7 +9,7 @@ use App\Services\Costing\OverheadAllocator;
 use App\Services\Costing\VarianceAnalyzer;
 
 it('allocates overhead proportionally by kg', function (): void {
-    $allocator = new OverheadAllocator();
+    $allocator = new OverheadAllocator;
 
     $result = $allocator->allocateItems('100', 'per_kg', [
         ['kg' => '50'],
@@ -22,7 +22,7 @@ it('allocates overhead proportionally by kg', function (): void {
 });
 
 it('allocates incident cost by kg', function (): void {
-    $allocator = new IncidentCostAllocator();
+    $allocator = new IncidentCostAllocator;
 
     $result = $allocator->allocate('100', 'by_kg', [
         'kg' => '25',
@@ -33,7 +33,7 @@ it('allocates incident cost by kg', function (): void {
 });
 
 it('calculates batch cost with yield and per-kg output', function (): void {
-    $calculator = new BatchCostCalculator();
+    $calculator = new BatchCostCalculator;
 
     $batch = [
         'input_kg' => '1500',
@@ -70,7 +70,7 @@ it('calculates batch cost with yield and per-kg output', function (): void {
 });
 
 it('calculates daily total with batches and daily expenses', function (): void {
-    $calculator = new DailyCostCalculator();
+    $calculator = new DailyCostCalculator;
 
     $result = $calculator->calculate(
         [
@@ -95,7 +95,7 @@ it('calculates daily total with batches and daily expenses', function (): void {
 });
 
 it('produces a variance bridge for standard to actual', function (): void {
-    $analyzer = new VarianceAnalyzer();
+    $analyzer = new VarianceAnalyzer;
 
     $result = $analyzer->analyze(
         [

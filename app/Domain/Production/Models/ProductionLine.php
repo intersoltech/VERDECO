@@ -3,16 +3,18 @@
 namespace App\Domain\Production\Models;
 
 use App\Domain\Organization\Models\Plant;
+use Database\Factories\ProductionLineFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ProductionLine extends Model
 {
-    use \Illuminate\Database\Eloquent\Factories\HasFactory;
+    use HasFactory;
 
-    protected static function newFactory(): \Database\Factories\ProductionLineFactory
+    protected static function newFactory(): ProductionLineFactory
     {
-        return \Database\Factories\ProductionLineFactory::new();
+        return ProductionLineFactory::new();
     }
 
     protected $fillable = [

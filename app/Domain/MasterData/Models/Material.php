@@ -3,17 +3,19 @@
 namespace App\Domain\MasterData\Models;
 
 use App\Domain\Organization\Models\Plant;
+use Database\Factories\MaterialFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Material extends Model
 {
-    use \Illuminate\Database\Eloquent\Factories\HasFactory;
+    use HasFactory;
 
-    protected static function newFactory(): \Database\Factories\MaterialFactory
+    protected static function newFactory(): MaterialFactory
     {
-        return \Database\Factories\MaterialFactory::new();
+        return MaterialFactory::new();
     }
 
     protected $fillable = [

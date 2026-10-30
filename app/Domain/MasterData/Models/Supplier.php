@@ -3,17 +3,19 @@
 namespace App\Domain\MasterData\Models;
 
 use App\Domain\Organization\Models\Plant;
+use Database\Factories\SupplierFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Supplier extends Model
 {
-    use \Illuminate\Database\Eloquent\Factories\HasFactory;
+    use HasFactory;
 
-    protected static function newFactory(): \Database\Factories\SupplierFactory
+    protected static function newFactory(): SupplierFactory
     {
-        return \Database\Factories\SupplierFactory::new();
+        return SupplierFactory::new();
     }
 
     protected $fillable = [

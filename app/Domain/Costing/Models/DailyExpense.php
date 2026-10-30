@@ -33,7 +33,7 @@ class DailyExpense extends Model
 
     public function summary(): BelongsTo
     {
-        return $this->belongsTo(\App\Domain\Costing\Models\DailyProductionSummary::class, 'daily_production_summary_id');
+        return $this->belongsTo(DailyProductionSummary::class, 'daily_production_summary_id');
     }
 
     public function plant(): BelongsTo

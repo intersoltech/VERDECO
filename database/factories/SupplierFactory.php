@@ -20,8 +20,8 @@ class SupplierFactory extends Factory
         return [
             'tenant_id' => fn (array $attrs) => Plant::find($attrs['plant_id'])?->tenant_id ?? 1,
             'plant_id' => Plant::factory(),
-            'name' => fake()->company() . ' Recycling',
-            'code' => 'SUP-' . strtoupper(fake()->unique()->bothify('???-###')),
+            'name' => fake()->company().' Recycling',
+            'code' => 'SUP-'.strtoupper(fake()->unique()->bothify('???-###')),
             'country_code' => 'US',
             'is_active' => true,
         ];

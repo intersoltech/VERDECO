@@ -3,6 +3,7 @@
 namespace App\Domain\Costing\Models;
 
 use App\Domain\Organization\Models\Plant;
+use Database\Factories\BudgetFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -13,9 +14,9 @@ class Budget extends Model
 {
     use HasFactory, LogsActivity;
 
-    protected static function newFactory(): \Database\Factories\BudgetFactory
+    protected static function newFactory(): BudgetFactory
     {
-        return \Database\Factories\BudgetFactory::new();
+        return BudgetFactory::new();
     }
 
     protected $fillable = [
@@ -30,7 +31,7 @@ class Budget extends Model
     ];
 
     protected $casts = [
-        'period_month' => 'date',
+        'period_month' => 'string',
         'budgeted_cost' => 'decimal:2',
         'budgeted_output_kg' => 'decimal:4',
         'budgeted_cost_per_kg' => 'decimal:6',

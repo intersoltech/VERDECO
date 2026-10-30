@@ -32,7 +32,7 @@ class ProductionBatchFactory extends Factory
             'plant_id' => Plant::factory(),
             'line_id' => ProductionLine::factory(),
             'product_grade_id' => ProductGrade::factory(),
-            'batch_number' => 'B-' . strtoupper(fake()->unique()->bothify('????-#####')),
+            'batch_number' => 'B-'.strtoupper(fake()->unique()->bothify('????-#####')),
             'batch_date' => now()->toDateString(),
             'status' => 'draft',
             'input_kg' => $inputKg,

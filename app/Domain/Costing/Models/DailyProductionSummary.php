@@ -50,7 +50,7 @@ class DailyProductionSummary extends Model
 
     public function expenses(): HasMany
     {
-        return $this->hasMany(\App\Domain\Costing\Models\DailyExpense::class, 'daily_production_summary_id');
+        return $this->hasMany(DailyExpense::class, 'daily_production_summary_id');
     }
 
     public function batches(): BelongsToMany

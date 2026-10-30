@@ -60,7 +60,7 @@ trait RoleAwareResourceAccess
             return false;
         }
 
-        return $user->hasRole('admin') || $user->hasPermission(static::permissionArea() . '.read');
+        return $user->hasRole('admin') || $user->hasPermission(static::permissionArea().'.read');
     }
 
     public static function canCreate(): bool
@@ -72,7 +72,7 @@ trait RoleAwareResourceAccess
         }
 
         return $user->hasRole('admin') || (
-            $user->hasPermission(static::permissionArea() . '.manage')
+            $user->hasPermission(static::permissionArea().'.manage')
             && $user->accessiblePlantIds()->isNotEmpty()
         );
     }
@@ -89,7 +89,7 @@ trait RoleAwareResourceAccess
             return true;
         }
 
-        return $user->hasPermission(static::permissionArea() . '.manage')
+        return $user->hasPermission(static::permissionArea().'.manage')
             && ($record instanceof Plant
                 ? $user->canAccessPlant($record)
                 : $user->canAccessPlant($record->plant));

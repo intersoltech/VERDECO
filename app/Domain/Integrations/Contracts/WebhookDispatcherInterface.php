@@ -9,10 +9,7 @@ interface WebhookDispatcherInterface
     /**
      * Dispatch an outbound signed webhook event to subscribed endpoints.
      *
-     * @param string $event
-     * @param array<string, mixed> $payload
-     * @param int|null $tenantId
-     * @param int|null $plantId
+     * @param  array<string, mixed>  $payload
      */
     public function dispatch(string $event, array $payload, ?int $tenantId = null, ?int $plantId = null): void;
 }

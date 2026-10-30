@@ -34,11 +34,11 @@ class AlertRule extends Model
     protected static function booted(): void
     {
         static::saving(function (self $rule): void {
-            if (empty($rule->tenant_id) && !empty($rule->plant_id)) {
+            if (empty($rule->tenant_id) && ! empty($rule->plant_id)) {
                 $rule->tenant_id = $rule->plant?->tenant_id;
             }
 
-            if (!empty($rule->plant_id) && empty($rule->tenant_id)) {
+            if (! empty($rule->plant_id) && empty($rule->tenant_id)) {
                 $rule->tenant_id = Plant::query()->find($rule->plant_id)?->tenant_id;
             }
         });

@@ -14,11 +14,9 @@ class AlertDigestNotification extends Notification implements ShouldQueue
     use Queueable;
 
     /**
-     * @param array<int, array<string, mixed>> $alerts
+     * @param  array<int, array<string, mixed>>  $alerts
      */
-    public function __construct(private readonly array $alerts)
-    {
-    }
+    public function __construct(private readonly array $alerts) {}
 
     /**
      * @return array<int, string>

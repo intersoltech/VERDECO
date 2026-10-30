@@ -7,8 +7,8 @@ namespace App\Services\Costing;
 final class BatchCostCalculator
 {
     public function __construct(
-        private readonly OverheadAllocator $overheadAllocator = new OverheadAllocator(),
-        private readonly IncidentCostAllocator $incidentAllocator = new IncidentCostAllocator(),
+        private readonly OverheadAllocator $overheadAllocator = new OverheadAllocator,
+        private readonly IncidentCostAllocator $incidentAllocator = new IncidentCostAllocator,
     ) {}
 
     /**

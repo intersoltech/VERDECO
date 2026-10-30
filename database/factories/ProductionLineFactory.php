@@ -20,8 +20,8 @@ class ProductionLineFactory extends Factory
         return [
             'tenant_id' => fn (array $attrs) => Plant::find($attrs['plant_id'])?->tenant_id ?? 1,
             'plant_id' => Plant::factory(),
-            'name' => 'Extrusion Line ' . fake()->numberBetween(1, 10),
-            'code' => 'LINE-' . strtoupper(fake()->unique()->bothify('??-##')),
+            'name' => 'Extrusion Line '.fake()->numberBetween(1, 10),
+            'code' => 'LINE-'.strtoupper(fake()->unique()->bothify('??-##')),
             'type' => 'extrusion',
             'rated_kg_per_hr' => 2000.0000,
             'rated_kw' => 450.0000,

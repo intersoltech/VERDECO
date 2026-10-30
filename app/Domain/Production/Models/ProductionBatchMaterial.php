@@ -4,16 +4,18 @@ namespace App\Domain\Production\Models;
 
 use App\Domain\MasterData\Models\Material;
 use App\Domain\Organization\Models\Plant;
+use Database\Factories\ProductionBatchMaterialFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ProductionBatchMaterial extends Model
 {
-    use \Illuminate\Database\Eloquent\Factories\HasFactory;
+    use HasFactory;
 
-    protected static function newFactory(): \Database\Factories\ProductionBatchMaterialFactory
+    protected static function newFactory(): ProductionBatchMaterialFactory
     {
-        return \Database\Factories\ProductionBatchMaterialFactory::new();
+        return ProductionBatchMaterialFactory::new();
     }
 
     protected $fillable = [
@@ -42,7 +44,7 @@ class ProductionBatchMaterial extends Model
 
     public function batch(): BelongsTo
     {
-        return $this->belongsTo(\App\Domain\Production\Models\ProductionBatch::class, 'production_batch_id');
+        return $this->belongsTo(ProductionBatch::class, 'production_batch_id');
     }
 
     public function plant(): BelongsTo

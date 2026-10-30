@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
-use App\Domain\Organization\Models\Plant;
 use App\Domain\Production\Models\ProductionBatch;
 use App\Domain\Quality\Models\BatchQualityResult;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -23,7 +22,7 @@ class BatchQualityResultFactory extends Factory
             'plant_id' => fn (array $attrs) => ProductionBatch::find($attrs['production_batch_id'])?->plant_id ?? 1,
             'production_batch_id' => ProductionBatch::factory(),
             'tested_at' => now(),
-            'sample_identifier' => 'SMP-' . fake()->unique()->numerify('#####'),
+            'sample_identifier' => 'SMP-'.fake()->unique()->numerify('#####'),
             'intrinsic_viscosity' => 0.8250,
             'acetaldehyde_ppm' => 0.8500,
             'color_l' => 72.5000,

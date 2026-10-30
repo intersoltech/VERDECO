@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Database\Factories;
 
 use App\Domain\MasterData\Models\Material;
-use App\Domain\Organization\Models\Plant;
 use App\Domain\Production\Models\ProductionBatch;
 use App\Domain\Production\Models\ProductionBatchMaterial;
 use Illuminate\Database\Eloquent\Factories\Factory;

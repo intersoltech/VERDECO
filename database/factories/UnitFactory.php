@@ -17,7 +17,7 @@ class UnitFactory extends Factory
     public function definition(): array
     {
         return [
-            'code' => 'kg-' . fake()->unique()->numerify('###'),
+            'code' => 'kg-'.fake()->unique()->numerify('###'),
             'name' => 'Kilogram',
             'symbol' => 'kg',
             'type' => 'mass',

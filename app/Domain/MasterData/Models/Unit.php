@@ -3,6 +3,7 @@
 namespace App\Domain\MasterData\Models;
 
 use App\Services\Costing\DecimalMath;
+use Database\Factories\UnitFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -10,9 +11,9 @@ class Unit extends Model
 {
     use HasFactory;
 
-    protected static function newFactory(): \Database\Factories\UnitFactory
+    protected static function newFactory(): UnitFactory
     {
-        return \Database\Factories\UnitFactory::new();
+        return UnitFactory::new();
     }
 
     protected $fillable = [

@@ -12,7 +12,6 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 class UnitResource extends Resource
@@ -36,6 +35,7 @@ class UnitResource extends Resource
         if ($user === null) {
             return false;
         }
+
         return $user->hasRole('admin') || $user->hasPermission('units.read');
     }
 
@@ -45,6 +45,7 @@ class UnitResource extends Resource
         if ($user === null) {
             return false;
         }
+
         return $user->hasRole('admin') || $user->hasPermission('units.manage');
     }
 
@@ -54,6 +55,7 @@ class UnitResource extends Resource
         if ($user === null) {
             return false;
         }
+
         return $user->hasRole('admin') || $user->hasPermission('units.manage');
     }
 
@@ -87,12 +89,12 @@ class UnitResource extends Resource
 
                     Forms\Components\Select::make('type')
                         ->options([
-                            'mass'     => 'Mass / Weight',
-                            'volume'   => 'Volume',
-                            'energy'   => 'Energy',
+                            'mass' => 'Mass / Weight',
+                            'volume' => 'Volume',
+                            'energy' => 'Energy',
                             'currency' => 'Currency',
-                            'time'     => 'Time',
-                            'other'    => 'Other',
+                            'time' => 'Time',
+                            'other' => 'Other',
                         ])
                         ->required()
                         ->columnSpan(1),
@@ -136,12 +138,12 @@ class UnitResource extends Resource
                     ->label('Type')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'mass'     => 'info',
-                        'volume'   => 'success',
-                        'energy'   => 'warning',
+                        'mass' => 'info',
+                        'volume' => 'success',
+                        'energy' => 'warning',
                         'currency' => 'danger',
-                        'time'     => 'gray',
-                        default    => 'gray',
+                        'time' => 'gray',
+                        default => 'gray',
                     })
                     ->sortable(),
 
@@ -156,12 +158,12 @@ class UnitResource extends Resource
             ->filters([
                 Tables\Filters\SelectFilter::make('type')
                     ->options([
-                        'mass'     => 'Mass',
-                        'volume'   => 'Volume',
-                        'energy'   => 'Energy',
+                        'mass' => 'Mass',
+                        'volume' => 'Volume',
+                        'energy' => 'Energy',
                         'currency' => 'Currency',
-                        'time'     => 'Time',
-                        'other'    => 'Other',
+                        'time' => 'Time',
+                        'other' => 'Other',
                     ]),
                 Tables\Filters\TernaryFilter::make('is_active')->label('Active'),
             ])
@@ -179,9 +181,9 @@ class UnitResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index'  => Pages\ListUnits::route('/'),
+            'index' => Pages\ListUnits::route('/'),
             'create' => Pages\CreateUnit::route('/create'),
-            'edit'   => Pages\EditUnit::route('/{record}/edit'),
+            'edit' => Pages\EditUnit::route('/{record}/edit'),
         ];
     }
 }

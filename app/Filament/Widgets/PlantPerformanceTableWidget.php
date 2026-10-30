@@ -10,11 +10,11 @@ use Filament\Widgets\TableWidget as BaseWidget;
 
 class PlantPerformanceTableWidget extends BaseWidget
 {
-    protected int | string | array $columnSpan = 'full';
+    protected int|string|array $columnSpan = 'full';
 
     public function table(Table $table): Table
     {
-        $summaryService = new PlantCostSummaryService();
+        $summaryService = new PlantCostSummaryService;
         $user = auth()->user();
         $query = Plant::query()->select('*');
 

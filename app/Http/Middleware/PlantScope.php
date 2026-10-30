@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Domain\Organization\Models\Plant;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -20,7 +21,7 @@ class PlantScope
             return $next($request);
         }
 
-        $plant = \App\Domain\Organization\Models\Plant::find((int) $plantId);
+        $plant = Plant::find((int) $plantId);
 
         if ($plant === null || ! Auth::user()->canAccessPlant($plant)) {
             abort(403, 'You do not have access to the requested plant.');

@@ -20,8 +20,8 @@ class ProductGradeFactory extends Factory
         return [
             'tenant_id' => fn (array $attrs) => Plant::find($attrs['plant_id'])?->tenant_id ?? 1,
             'plant_id' => Plant::factory(),
-            'name' => 'Food Grade rPET ' . fake()->randomElement(['Bottle-to-Bottle', 'Sheet Grade', 'Thermoforming']),
-            'code' => 'GRADE-' . strtoupper(fake()->unique()->bothify('???-###')),
+            'name' => 'Food Grade rPET '.fake()->randomElement(['Bottle-to-Bottle', 'Sheet Grade', 'Thermoforming']),
+            'code' => 'GRADE-'.strtoupper(fake()->unique()->bothify('???-###')),
             'grade_type' => 'food_grade',
             'iv_min' => 0.8000,
             'iv_max' => 0.8400,

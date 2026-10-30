@@ -28,7 +28,7 @@ final class DirectTagAllocationStrategy implements AllocationStrategyInterface
         $matchedIndices = [];
 
         foreach ($items as $idx => $item) {
-            if (!empty($item['matched']) || !empty($item['direct_tag'])) {
+            if (! empty($item['matched']) || ! empty($item['direct_tag'])) {
                 $matchedIndices[] = $idx;
             }
         }

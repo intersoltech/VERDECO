@@ -88,7 +88,7 @@ class PublicOperationalDataAccessTest extends TestCase
     {
         return Plant::create([
             'tenant_id' => $organization->id,
-            'name' => $code . ' Plant',
+            'name' => $code.' Plant',
             'code' => $code,
             'location' => $code,
             'timezone' => 'UTC',

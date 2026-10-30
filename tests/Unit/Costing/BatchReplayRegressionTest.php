@@ -14,7 +14,7 @@ class BatchReplayRegressionTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->calculator = new BatchCostCalculator();
+        $this->calculator = new BatchCostCalculator;
     }
 
     /**

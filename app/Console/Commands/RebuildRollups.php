@@ -2,6 +2,10 @@
 
 namespace App\Console\Commands;
 
+use App\Domain\Reporting\Models\FactDailyLineCost;
+use App\Domain\Reporting\Models\FactDailyPlantKpi;
+use App\Domain\Reporting\Models\FactIncidentSummary;
+use App\Domain\Reporting\Models\FactMonthlyVariance;
 use App\Services\Reporting\FactRollupService;
 use Illuminate\Console\Command;
 
@@ -10,7 +14,8 @@ class RebuildRollups extends Command
     protected $signature = 'rollups:rebuild 
                             {--plant= : Plant ID to scope rollup rebuild} 
                             {--start= : Start date (YYYY-MM-DD)} 
-                            {--end= : End date (YYYY-MM-DD)}';
+                            {--end= : End date (YYYY-MM-DD)}
+                            {--fresh : Truncate fact tables before rebuild}';
 
     protected $description = 'Idempotently rebuild fact rollup tables from raw operational events';
 
@@ -20,7 +25,22 @@ class RebuildRollups extends Command
         $start = $this->option('start');
         $end = $this->option('end');
 
-        $this->info("Rebuilding fact rollup tables...");
+        if ($this->option('fresh')) {
+            $this->warn('Truncating fact tables before rebuild...');
+            if ($plantId) {
+                FactDailyLineCost::where('plant_id', $plantId)->delete();
+                FactDailyPlantKpi::where('plant_id', $plantId)->delete();
+                FactMonthlyVariance::where('plant_id', $plantId)->delete();
+                FactIncidentSummary::where('plant_id', $plantId)->delete();
+            } else {
+                FactDailyLineCost::truncate();
+                FactDailyPlantKpi::truncate();
+                FactMonthlyVariance::truncate();
+                FactIncidentSummary::truncate();
+            }
+        }
+
+        $this->info('Rebuilding fact rollup tables...');
 
         $stats = $rollupService->rebuild($plantId, $start, $end);
 
@@ -37,7 +57,7 @@ class RebuildRollups extends Command
             ]
         );
 
-        $this->info("Fact rollup tables rebuild completed successfully.");
+        $this->info('Fact rollup tables rebuild completed successfully.');
 
         return self::SUCCESS;
     }

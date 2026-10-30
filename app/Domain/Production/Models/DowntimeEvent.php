@@ -4,7 +4,9 @@ namespace App\Domain\Production\Models;
 
 use App\Domain\Incidents\Models\CostIncident;
 use App\Domain\Organization\Models\Plant;
+use App\Domain\Production\Events\DowntimeLogged;
 use App\Models\User;
+use Database\Factories\DowntimeEventFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -15,9 +17,9 @@ class DowntimeEvent extends Model
 {
     use HasFactory, LogsActivity;
 
-    protected static function newFactory(): \Database\Factories\DowntimeEventFactory
+    protected static function newFactory(): DowntimeEventFactory
     {
-        return \Database\Factories\DowntimeEventFactory::new();
+        return DowntimeEventFactory::new();
     }
 
     protected $fillable = [
@@ -33,6 +35,7 @@ class DowntimeEvent extends Model
         'lost_production_kg',
         'description',
         'resolution_notes',
+        'notes',
         'reported_by',
     ];
 
@@ -42,6 +45,13 @@ class DowntimeEvent extends Model
         'duration_minutes' => 'integer',
         'lost_production_kg' => 'decimal:4',
     ];
+
+    protected static function booted(): void
+    {
+        static::saved(function (DowntimeEvent $event): void {
+            DowntimeLogged::dispatch($event);
+        });
+    }
 
     public function getActivitylogOptions(): LogOptions
     {

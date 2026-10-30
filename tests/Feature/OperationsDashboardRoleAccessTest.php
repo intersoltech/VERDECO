@@ -2,15 +2,15 @@
 
 namespace Tests\Feature;
 
-use App\Filament\Pages\OperationsDashboard;
-use App\Filament\Widgets\CostPeriodSummaryWidget;
-use App\Filament\Widgets\OpenAlertsWidget;
-use App\Filament\Widgets\PlantCostSummaryWidget;
 use App\Domain\Alerts\Models\Alert;
 use App\Domain\Costing\Models\CostPeriod;
 use App\Domain\Incidents\Models\CostIncident;
 use App\Domain\Organization\Models\Organization;
 use App\Domain\Organization\Models\Plant;
+use App\Filament\Pages\OperationsDashboard;
+use App\Filament\Widgets\CostPeriodSummaryWidget;
+use App\Filament\Widgets\OpenAlertsWidget;
+use App\Filament\Widgets\PlantCostSummaryWidget;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -24,7 +24,7 @@ class OperationsDashboardRoleAccessTest extends TestCase
         $admin = User::factory()->create(['role' => 'admin']);
         $this->actingAs($admin);
 
-        $adminWidgets = (new OperationsDashboard())->getWidgets();
+        $adminWidgets = (new OperationsDashboard)->getWidgets();
         $this->assertContains(PlantCostSummaryWidget::class, $adminWidgets);
         $this->assertContains(CostPeriodSummaryWidget::class, $adminWidgets);
         $this->assertContains(OpenAlertsWidget::class, $adminWidgets);
@@ -32,7 +32,7 @@ class OperationsDashboardRoleAccessTest extends TestCase
         $operator = User::factory()->create(['role' => 'plant_operator']);
         $this->actingAs($operator);
 
-        $operatorWidgets = (new OperationsDashboard())->getWidgets();
+        $operatorWidgets = (new OperationsDashboard)->getWidgets();
         $this->assertContains(PlantCostSummaryWidget::class, $operatorWidgets);
         $this->assertContains(OpenAlertsWidget::class, $operatorWidgets);
         $this->assertNotContains(CostPeriodSummaryWidget::class, $operatorWidgets);
@@ -92,7 +92,7 @@ class OperationsDashboardRoleAccessTest extends TestCase
         $operator->plants()->attach($assignedPlant->id, ['tenant_id' => $organization->id]);
         $this->actingAs($operator);
 
-        $summary = (new OperationsDashboard())->getViewData();
+        $summary = (new OperationsDashboard)->getViewData();
 
         $this->assertSame(1, $summary['plants']);
         $this->assertSame(1, $summary['openAlerts']);
@@ -104,7 +104,7 @@ class OperationsDashboardRoleAccessTest extends TestCase
     {
         return Plant::create([
             'tenant_id' => $organization->id,
-            'name' => $code . ' Plant',
+            'name' => $code.' Plant',
             'code' => $code,
             'location' => $code,
             'timezone' => 'UTC',

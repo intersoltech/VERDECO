@@ -17,7 +17,7 @@ class AllocationPropertyTest extends TestCase
      */
     public function test_by_kg_allocation_sum_always_equals_pool(): void
     {
-        $strategy = new ByKgAllocationStrategy();
+        $strategy = new ByKgAllocationStrategy;
 
         $testPools = ['1000.00', '333.33', '9999.99', '0.01', '7654.321', '123456.78'];
 
@@ -49,7 +49,7 @@ class AllocationPropertyTest extends TestCase
 
     public function test_by_hours_allocation_sum_always_equals_pool(): void
     {
-        $strategy = new ByHoursAllocationStrategy();
+        $strategy = new ByHoursAllocationStrategy;
         $pool = '5400.00';
 
         $items = [
@@ -73,7 +73,7 @@ class AllocationPropertyTest extends TestCase
 
     public function test_equal_split_sum_always_equals_pool(): void
     {
-        $strategy = new EqualSplitAllocationStrategy();
+        $strategy = new EqualSplitAllocationStrategy;
         $pool = '100.00'; // 100 split by 3 is 33.333333, last item gets remainder
 
         $items = [['id' => 1], ['id' => 2], ['id' => 3]];
@@ -92,7 +92,7 @@ class AllocationPropertyTest extends TestCase
 
     public function test_fixed_overhead_volume_under_absorption(): void
     {
-        $strategy = new OverheadVolumeVarianceStrategy();
+        $strategy = new OverheadVolumeVarianceStrategy;
 
         // 100% capacity: actual output = capacity -> 0 variance
         $fullCapacity = $strategy->calculate(

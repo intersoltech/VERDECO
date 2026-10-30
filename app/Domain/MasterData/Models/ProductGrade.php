@@ -3,16 +3,18 @@
 namespace App\Domain\MasterData\Models;
 
 use App\Domain\Organization\Models\Plant;
+use Database\Factories\ProductGradeFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ProductGrade extends Model
 {
-    use \Illuminate\Database\Eloquent\Factories\HasFactory;
+    use HasFactory;
 
-    protected static function newFactory(): \Database\Factories\ProductGradeFactory
+    protected static function newFactory(): ProductGradeFactory
     {
-        return \Database\Factories\ProductGradeFactory::new();
+        return ProductGradeFactory::new();
     }
 
     protected $fillable = [

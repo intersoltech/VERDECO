@@ -2,7 +2,6 @@
 
 namespace Tests\Feature;
 
-use App\Domain\Costing\Models\Budget;
 use App\Domain\MasterData\Models\Unit;
 use App\Domain\Organization\Models\Organization;
 use App\Domain\Organization\Models\Plant;

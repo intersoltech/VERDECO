@@ -5,6 +5,7 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Domain\Identity\Contracts\PlantAccessibleUserInterface;
 use App\Domain\Organization\Models\Plant;
+use Database\Factories\UserFactory;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -17,7 +18,7 @@ use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable implements FilamentUser, PlantAccessibleUserInterface
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
+    /** @use HasFactory<UserFactory> */
     use HasApiTokens, HasFactory, HasRoles, Notifiable {
         hasRole as protected spatieHasRole;
         hasAnyRole as protected spatieHasAnyRole;
@@ -53,8 +54,8 @@ class User extends Authenticatable implements FilamentUser, PlantAccessibleUserI
     {
         return [
             'email_verified_at' => 'datetime',
-            'password'          => 'hashed',
-            'permissions'       => 'array',
+            'password' => 'hashed',
+            'permissions' => 'array',
         ];
     }
 
@@ -145,7 +146,7 @@ class User extends Authenticatable implements FilamentUser, PlantAccessibleUserI
 
     public function canAccessPanel(Panel $panel): bool
     {
-        return $this->hasAnyRole(['admin', 'plant_manager', 'plant_supervisor', 'plant_operator']);
+        return $this->hasAnyRole(['admin', 'controller', 'plant_manager', 'plant_supervisor', 'plant_operator', 'viewer']);
     }
 
     /**
@@ -154,7 +155,7 @@ class User extends Authenticatable implements FilamentUser, PlantAccessibleUserI
     protected function rolePermissions(): array
     {
         return match (strtolower((string) ($this->role ?? 'plant_operator'))) {
-            'admin' => [
+            'admin', 'controller' => [
                 'view-any-plant', 'view-plant', 'create-plant', 'update-plant', 'delete-plant',
                 'view-any-alert', 'view-alert', 'create-alert', 'update-alert', 'delete-alert',
                 'view-any-alert-rule', 'view-alert-rule', 'create-alert-rule', 'update-alert-rule', 'delete-alert-rule',
@@ -220,6 +221,25 @@ class User extends Authenticatable implements FilamentUser, PlantAccessibleUserI
                 'units.read',
                 'cost-periods.read',
                 'costs.read',
+                'incidents.read',
+                'alerts.read',
+            ],
+            'viewer' => [
+                'view-plant', 'view-any-plant',
+                'view-alert', 'view-any-alert',
+                'view-alert-rule',
+                'plants.read',
+                'production-lines.read',
+                'production-batches.read',
+                'costs.read',
+                'suppliers.read',
+                'materials.read',
+                'product-grades.read',
+                'standard-costs.read',
+                'units.read',
+                'cost-categories.read',
+                'budgets.read',
+                'cost-periods.read',
                 'incidents.read',
                 'alerts.read',
             ],

@@ -7,7 +7,6 @@ namespace App\Services\Costing;
 use App\Domain\Costing\Models\DailyProductionSummary;
 use App\Domain\Incidents\Models\CostIncident;
 use App\Domain\Production\Models\ProductionBatch;
-use App\Services\Costing\DecimalMath;
 use Illuminate\Support\Facades\DB;
 use LogicException;
 
@@ -31,7 +30,7 @@ final class DailyProductionCostingService
                 ->where('tenant_id', $summary->tenant_id)
                 ->where('plant_id', $summary->plant_id)
                 ->whereDate('batch_date', $summary->production_date)
-                ->where('status', 'costed')
+                ->whereIn('status', ['costed', 'closed'])
                 ->get();
 
             $incidents = CostIncident::query()

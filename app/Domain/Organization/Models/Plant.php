@@ -8,6 +8,9 @@ use App\Domain\Incidents\Models\CostIncident;
 use App\Domain\MasterData\Models\Material;
 use App\Domain\MasterData\Models\ProductGrade;
 use App\Domain\Production\Models\ProductionLine;
+use App\Models\User;
+use Database\Factories\PlantFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -15,11 +18,11 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Plant extends Model
 {
-    use \Illuminate\Database\Eloquent\Factories\HasFactory;
+    use HasFactory;
 
-    protected static function newFactory(): \Database\Factories\PlantFactory
+    protected static function newFactory(): PlantFactory
     {
-        return \Database\Factories\PlantFactory::new();
+        return PlantFactory::new();
     }
 
     protected $fillable = [
@@ -70,6 +73,6 @@ class Plant extends Model
 
     public function users(): BelongsToMany
     {
-        return $this->belongsToMany(config('auth.providers.users.model', \App\Models\User::class), 'plant_user', 'plant_id', 'user_id');
+        return $this->belongsToMany(config('auth.providers.users.model', User::class), 'plant_user', 'plant_id', 'user_id');
     }
 }

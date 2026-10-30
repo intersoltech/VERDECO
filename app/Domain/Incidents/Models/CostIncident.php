@@ -1,20 +1,29 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Domain\Incidents\Models;
 
+use App\Domain\Incidents\Events\IncidentApproved;
 use App\Domain\Organization\Models\Plant;
+use App\Domain\Production\Models\ProductionLine;
 use App\Models\User;
+use Database\Factories\CostIncidentFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use LogicException;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class CostIncident extends Model
 {
-    use \Illuminate\Database\Eloquent\Factories\HasFactory;
+    use HasFactory, LogsActivity;
 
-    protected static function newFactory(): \Database\Factories\CostIncidentFactory
+    protected static function newFactory(): CostIncidentFactory
     {
-        return \Database\Factories\CostIncidentFactory::new();
+        return CostIncidentFactory::new();
     }
 
     protected $fillable = [
@@ -26,6 +35,7 @@ class CostIncident extends Model
         'root_cause_category',
         'description',
         'owner',
+        'reported_by_user_id',
         'status',
         'occurred_at',
         'cash_cost',
@@ -46,14 +56,36 @@ class CostIncident extends Model
         'reopened_at' => 'datetime',
     ];
 
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly([
+                'status',
+                'severity',
+                'incident_type',
+                'cash_cost',
+                'opportunity_cost',
+                'approved_by',
+                'approved_at',
+                'closed_by',
+                'closed_at',
+            ])
+            ->logOnlyDirty();
+    }
+
     public function line(): BelongsTo
     {
-        return $this->belongsTo(\App\Domain\Production\Models\ProductionLine::class, 'line_id');
+        return $this->belongsTo(ProductionLine::class, 'line_id');
     }
 
     public function plant(): BelongsTo
     {
         return $this->belongsTo(Plant::class, 'plant_id');
+    }
+
+    public function reportedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'reported_by_user_id');
     }
 
     public function approvedBy(): BelongsTo
@@ -78,6 +110,10 @@ class CostIncident extends Model
 
     public function approve(?User $user = null): void
     {
+        if ($user && $this->reported_by_user_id && $this->reported_by_user_id === $user->id) {
+            throw new LogicException('Dual control violation: The user who reported this incident cannot approve it.');
+        }
+
         $this->status = 'approved';
         $this->approved_by = $user?->id ?? $this->approved_by;
         $this->approved_at = $this->approved_at ?? now();
@@ -86,6 +122,8 @@ class CostIncident extends Model
         $this->reopened_by = null;
         $this->reopened_at = null;
         $this->save();
+
+        IncidentApproved::dispatch($this);
     }
 
     public function close(?User $user = null): void

@@ -42,6 +42,7 @@ class BatchQualityResultResource extends Resource
                     Forms\Components\Select::make('production_batch_id')
                         ->relationship('batch', 'batch_number', modifyQueryUsing: function ($query, Forms\Get $get) {
                             $plantId = $get('plant_id');
+
                             return $plantId ? $query->where('plant_id', $plantId) : $query;
                         })
                         ->label('Production batch')

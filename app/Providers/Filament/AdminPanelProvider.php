@@ -2,6 +2,24 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Pages\OperationsDashboard;
+use App\Filament\Resources\AlertResource;
+use App\Filament\Resources\AlertRuleResource;
+use App\Filament\Resources\BatchQualityResultResource;
+use App\Filament\Resources\BudgetResource;
+use App\Filament\Resources\CostCategoryResource;
+use App\Filament\Resources\CostIncidentResource;
+use App\Filament\Resources\CostPeriodResource;
+use App\Filament\Resources\DailyProductionSummaryResource;
+use App\Filament\Resources\DowntimeEventResource;
+use App\Filament\Resources\MaterialResource;
+use App\Filament\Resources\PlantResource;
+use App\Filament\Resources\ProductGradeResource;
+use App\Filament\Resources\ProductionBatchResource;
+use App\Filament\Resources\ProductionLineResource;
+use App\Filament\Resources\StandardCostResource;
+use App\Filament\Resources\SupplierResource;
+use App\Filament\Resources\UnitResource;
 use App\Filament\Widgets\OpenAlertsWidget;
 use App\Filament\Widgets\PlantCostSummaryWidget;
 use App\Filament\Widgets\PlantPerformanceTableWidget;
@@ -9,7 +27,6 @@ use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
@@ -30,10 +47,10 @@ class AdminPanelProvider extends PanelProvider
             ->favicon(asset('favicon.ico'))
             ->colors([
                 'primary' => Color::Amber,
-                'danger'  => Color::Rose,
+                'danger' => Color::Rose,
                 'success' => Color::Emerald,
                 'warning' => Color::Yellow,
-                'info'    => Color::Sky,
+                'info' => Color::Sky,
             ])
             ->default()
             ->id('admin')
@@ -45,7 +62,7 @@ class AdminPanelProvider extends PanelProvider
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
-                \App\Filament\Pages\OperationsDashboard::class,
+                OperationsDashboard::class,
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
@@ -70,33 +87,33 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->resources([
                 // Organization & Setup
-                \App\Filament\Resources\PlantResource::class,
-                \App\Filament\Resources\ProductionLineResource::class,
-                \App\Filament\Resources\SupplierResource::class,
+                PlantResource::class,
+                ProductionLineResource::class,
+                SupplierResource::class,
 
                 // Master Data
-                \App\Filament\Resources\MaterialResource::class,
-                \App\Filament\Resources\ProductGradeResource::class,
-                \App\Filament\Resources\UnitResource::class,
-                \App\Filament\Resources\CostCategoryResource::class,
+                MaterialResource::class,
+                ProductGradeResource::class,
+                UnitResource::class,
+                CostCategoryResource::class,
 
                 // Standards & Budgets
-                \App\Filament\Resources\StandardCostResource::class,
-                \App\Filament\Resources\BudgetResource::class,
+                StandardCostResource::class,
+                BudgetResource::class,
 
                 // Operations
-                \App\Filament\Resources\ProductionBatchResource::class,
-                \App\Filament\Resources\DowntimeEventResource::class,
-                \App\Filament\Resources\BatchQualityResultResource::class,
-                \App\Filament\Resources\DailyProductionSummaryResource::class,
+                ProductionBatchResource::class,
+                DowntimeEventResource::class,
+                BatchQualityResultResource::class,
+                DailyProductionSummaryResource::class,
 
                 // Cost Management
-                \App\Filament\Resources\CostIncidentResource::class,
-                \App\Filament\Resources\CostPeriodResource::class,
+                CostIncidentResource::class,
+                CostPeriodResource::class,
 
                 // Monitoring
-                \App\Filament\Resources\AlertResource::class,
-                \App\Filament\Resources\AlertRuleResource::class,
+                AlertResource::class,
+                AlertRuleResource::class,
             ])
             ->navigationGroups([
                 'Operations',

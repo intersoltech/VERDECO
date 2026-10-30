@@ -3,8 +3,11 @@
 use App\Domain\Alerts\Models\Alert;
 use App\Domain\Incidents\Models\CostIncident;
 use App\Domain\Organization\Models\Plant;
+use App\Domain\Production\Models\ProductionBatch;
 use App\Http\Controllers\HealthController;
 use App\Services\Costing\PlantCostSummaryService;
+use App\Services\Reporting\ExportService;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
 
@@ -36,7 +39,7 @@ Route::get('/', function () {
     $plantCount = $plantQuery->count();
     $alertCount = $alertQuery->count();
     $incidentCount = $incidentQuery->count();
-    $plantSummaries = (new PlantCostSummaryService())->forOrganization($user);
+    $plantSummaries = (new PlantCostSummaryService)->forOrganization($user);
     $recentAlerts = (clone $alertQuery)
         ->with('plant')
         ->orderByDesc('triggered_at')
@@ -139,3 +142,20 @@ Route::get('/api/alerts', function () {
         'alerts' => $alerts,
     ]);
 })->middleware('auth');
+
+Route::middleware('auth')->group(function () {
+    Route::get('/reports/batch/{batch}/pdf', function (ProductionBatch $batch, ExportService $exportService) {
+        return $exportService->downloadBatchPdf($batch);
+    })->name('reports.batch.pdf');
+
+    Route::get('/reports/batch/{batch}/excel', function (ProductionBatch $batch, ExportService $exportService) {
+        return $exportService->downloadBatchExcel($batch);
+    })->name('reports.batch.excel');
+
+    Route::get('/reports/monthly-variance/excel', function (Request $request, ExportService $exportService) {
+        $plantId = $request->query('plant_id') ? (int) $request->query('plant_id') : null;
+        $month = $request->query('month');
+
+        return $exportService->downloadMonthlyVarianceExcel($plantId, $month);
+    })->name('reports.variance.excel');
+});

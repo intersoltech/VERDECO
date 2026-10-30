@@ -3,7 +3,6 @@
 namespace App\Console\Commands;
 
 use App\Domain\Costing\Models\Budget;
-use App\Domain\Costing\Models\CostCategory;
 use App\Domain\Costing\Models\StandardCost;
 use App\Domain\MasterData\Models\Material;
 use App\Domain\MasterData\Models\MaterialPrice;
@@ -75,14 +74,14 @@ class SeedScaleDemo extends Command
 
         for ($i = 0; $i < $plantCount; $i++) {
             $city = $cities[$i % count($cities)];
-            $code = $city[1] . ($i >= count($cities) ? ($i + 1) : '');
+            $code = $city[1].($i >= count($cities) ? ($i + 1) : '');
 
             DB::transaction(function () use ($tenant, $city, $code, $modes, $i, $startDate, $totalMonths, $batchesPerMonth) {
                 $plant = Plant::firstOrCreate(
                     ['tenant_id' => $tenant->id, 'code' => $code],
                     [
                         'tenant_id' => $tenant->id,
-                        'name' => "Verdeco " . explode(',', $city[0])[0],
+                        'name' => 'Verdeco '.explode(',', $city[0])[0],
                         'code' => $code,
                         'location' => $city[0],
                         'timezone' => $city[2],
@@ -96,7 +95,7 @@ class SeedScaleDemo extends Command
                 $extruder = ProductionLine::firstOrCreate(
                     ['tenant_id' => $tenant->id, 'plant_id' => $plant->id, 'code' => "{$code}-EXT-01"],
                     [
-                        'name' => "Extrusion Line 1",
+                        'name' => 'Extrusion Line 1',
                         'code' => "{$code}-EXT-01",
                         'type' => 'extruder',
                         'rated_kg_per_hr' => 2400.0,
@@ -108,7 +107,7 @@ class SeedScaleDemo extends Command
                 $ssp = ProductionLine::firstOrCreate(
                     ['tenant_id' => $tenant->id, 'plant_id' => $plant->id, 'code' => "{$code}-SSP-01"],
                     [
-                        'name' => "SSP Reactor 1",
+                        'name' => 'SSP Reactor 1',
                         'code' => "{$code}-SSP-01",
                         'type' => 'ssp',
                         'rated_kg_per_hr' => 2000.0,
@@ -132,7 +131,7 @@ class SeedScaleDemo extends Command
                     ['tenant_id' => $tenant->id, 'plant_id' => $plant->id, 'code' => "FLAKE-{$code}"],
                     [
                         'supplier_id' => $supplier->id,
-                        'name' => "Hot-Washed Clear Flake",
+                        'name' => 'Hot-Washed Clear Flake',
                         'code' => "FLAKE-{$code}",
                         'category' => 'feedstock',
                         'unit' => 'kg',
@@ -158,7 +157,7 @@ class SeedScaleDemo extends Command
                 $grade = ProductGrade::firstOrCreate(
                     ['tenant_id' => $tenant->id, 'plant_id' => $plant->id, 'code' => "FG20-{$code}"],
                     [
-                        'name' => "Food Grade rPET-20",
+                        'name' => 'Food Grade rPET-20',
                         'code' => "FG20-{$code}",
                         'grade_type' => 'food_grade',
                         'iv_min' => 0.76,
@@ -178,6 +177,7 @@ class SeedScaleDemo extends Command
                         'effective_from' => $startDate,
                     ],
                     [
+                        'status' => 'approved',
                         'standard_yield_percent' => 92.5,
                         'kg_per_hour' => 2200.0,
                         'kwh_per_kg' => 0.36,

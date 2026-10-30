@@ -14,7 +14,7 @@ class PlantCostSummaryWidget extends BaseWidget
     {
         $user = auth()->user();
         $plantIds = $user?->hasRole('admin') ? null : ($user?->accessiblePlantIds() ?? collect());
-        $summaries = (new PlantCostSummaryService())->forOrganization($user);
+        $summaries = (new PlantCostSummaryService)->forOrganization($user);
 
         $plantQuery = Plant::query();
         $incidentQuery = CostIncident::query()->where('status', '!=', 'closed');

@@ -22,8 +22,8 @@ class PlantFactory extends Factory
         return [
             'tenant_id' => Organization::factory(),
             'name' => "Verdeco {$city}",
-            'code' => 'V' . strtoupper(fake()->unique()->lexify('???')),
-            'location' => "{$city}, " . fake()->stateAbbr(),
+            'code' => 'V'.strtoupper(fake()->unique()->lexify('???')),
+            'location' => "{$city}, ".fake()->stateAbbr(),
             'timezone' => 'America/Chicago',
             'base_currency' => 'USD',
             'costing_mode' => 'both',
