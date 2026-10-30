@@ -6,53 +6,28 @@ namespace App\Services\Costing;
 
 final class IncidentCostAllocator
 {
+    public function __construct(
+        private readonly AllocationStrategyRegistry $registry = new AllocationStrategyRegistry()
+    ) {}
+
     /**
      * @param  array<string, mixed>  $batchContext
      */
     public function allocate(string $incidentCost, string $allocationRule, array $batchContext = []): string
     {
-        $incidentCost = DecimalMath::toDecimal($incidentCost);
-        $allocationRule = strtolower($allocationRule);
+        $strategy = $this->registry->get($allocationRule);
 
-        if (bccomp($incidentCost, '0', 6) === 0) {
-            return '0';
-        }
+        return $strategy->allocate($incidentCost, $batchContext);
+    }
 
-        if ($allocationRule === 'direct_tag') {
-            return ($batchContext['matched'] ?? false) ? $incidentCost : '0';
-        }
+    /**
+     * @param  list<array<string, mixed>>  $items
+     * @return list<array{item: mixed, allocated: string}>
+     */
+    public function allocateItems(string $incidentCost, string $allocationRule, array $items): array
+    {
+        $strategy = $this->registry->get($allocationRule);
 
-        if ($allocationRule === 'equal' || $allocationRule === 'per_batch') {
-            return $incidentCost;
-        }
-
-        $batchKg = DecimalMath::toDecimal($batchContext['kg'] ?? '0');
-        $batchHours = DecimalMath::toDecimal($batchContext['hours'] ?? '0');
-
-        if ($allocationRule === 'by_kg') {
-            $totalKg = DecimalMath::toDecimal($batchContext['total_kg'] ?? $batchKg);
-
-            if (bccomp($totalKg, '0', 6) === 0) {
-                return '0';
-            }
-
-            $share = DecimalMath::divide($batchKg, $totalKg);
-
-            return DecimalMath::multiply($incidentCost, $share);
-        }
-
-        if ($allocationRule === 'by_hours') {
-            $totalHours = DecimalMath::toDecimal($batchContext['total_hours'] ?? $batchHours);
-
-            if (bccomp($totalHours, '0', 6) === 0) {
-                return '0';
-            }
-
-            $share = DecimalMath::divide($batchHours, $totalHours);
-
-            return DecimalMath::multiply($incidentCost, $share);
-        }
-
-        return '0';
+        return $strategy->allocateItems($incidentCost, $items);
     }
 }

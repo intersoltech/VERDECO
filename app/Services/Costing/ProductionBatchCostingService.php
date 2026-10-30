@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\Costing;
 
+use App\Domain\Production\Events\BatchClosed;
 use App\Domain\Production\Models\ProductionBatch;
 use App\Domain\Production\Models\ProductionBatchMaterial;
 use Illuminate\Support\Facades\DB;
@@ -50,6 +51,8 @@ final class ProductionBatchCostingService
             $batch->status = 'costed';
             $batch->calculated_at = now();
             $batch->save();
+
+            BatchClosed::dispatch($batch);
 
             return $batch->refresh();
         });

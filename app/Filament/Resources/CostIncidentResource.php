@@ -40,7 +40,7 @@ class CostIncidentResource extends Resource
                             ->preload()
                             ->required(),
                         Forms\Components\Select::make('line_id')
-                            ->relationship('lines', 'name')
+                            ->relationship('line', 'name')
                             ->label('Line')
                             ->nullable(),
                         Forms\Components\Select::make('incident_type')->options([
@@ -71,6 +71,39 @@ class CostIncidentResource extends Resource
                         Forms\Components\Textarea::make('description')->rows(4)->columnSpanFull(),
                     ])
                     ->columns(2),
+                Forms\Components\Section::make('Incident Cost Breakdown Lines')
+                    ->schema([
+                        Forms\Components\Repeater::make('lines')
+                            ->relationship()
+                            ->schema([
+                                Forms\Components\Select::make('line_type')->options([
+                                    'extra_labor' => 'Extra Labor / Overtime',
+                                    'emergency_maintenance' => 'Emergency Maintenance',
+                                    'material_loss' => 'Material Loss / Contamination',
+                                    'rework' => 'Rework / Reprocessing',
+                                    'rush_freight' => 'Rush Freight / Expedite',
+                                    'utility_spike' => 'Utility Spike',
+                                    'quality_hold' => 'Quality Hold',
+                                    'safety_incident' => 'Safety Incident',
+                                    'other' => 'Other Incident Cost',
+                                ])->required(),
+                                Forms\Components\TextInput::make('description')->maxLength(255),
+                                Forms\Components\TextInput::make('extra_labor_hours')->numeric()->default(0)->label('Labor Hours'),
+                                Forms\Components\TextInput::make('extra_labor_rate')->numeric()->default(0)->label('Rate ($/hr)'),
+                                Forms\Components\TextInput::make('overtime_multiplier')->numeric()->default(1.5)->label('OT Mult'),
+                                Forms\Components\TextInput::make('headcount')->numeric()->default(1)->label('Headcount'),
+                                Forms\Components\TextInput::make('parts_cost')->numeric()->default(0)->label('Parts Cost ($)'),
+                                Forms\Components\TextInput::make('contractor_cost')->numeric()->default(0)->label('Contractor ($)'),
+                                Forms\Components\TextInput::make('material_loss_kg')->numeric()->default(0)->label('Loss (kg)'),
+                                Forms\Components\TextInput::make('material_loss_cost')->numeric()->default(0)->label('Loss Cost ($)'),
+                                Forms\Components\TextInput::make('rework_cost')->numeric()->default(0)->label('Rework ($)'),
+                                Forms\Components\TextInput::make('rush_freight_cost')->numeric()->default(0)->label('Rush Freight ($)'),
+                                Forms\Components\TextInput::make('other_cost')->numeric()->default(0)->label('Other Cost ($)'),
+                            ])
+                            ->columns(4)
+                            ->defaultItems(0)
+                            ->addActionLabel('Add Incident Cost Line'),
+                    ]),
                 Forms\Components\Section::make('Lifecycle audit')
                     ->schema([
                         Forms\Components\Select::make('approved_by')

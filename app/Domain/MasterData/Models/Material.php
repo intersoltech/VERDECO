@@ -9,6 +9,13 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Material extends Model
 {
+    use \Illuminate\Database\Eloquent\Factories\HasFactory;
+
+    protected static function newFactory(): \Database\Factories\MaterialFactory
+    {
+        return \Database\Factories\MaterialFactory::new();
+    }
+
     protected $fillable = [
         'tenant_id',
         'plant_id',

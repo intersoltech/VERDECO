@@ -10,6 +10,13 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class ProductionBatch extends Model
 {
+    use \Illuminate\Database\Eloquent\Factories\HasFactory;
+
+    protected static function newFactory(): \Database\Factories\ProductionBatchFactory
+    {
+        return \Database\Factories\ProductionBatchFactory::new();
+    }
+
     protected $fillable = [
         'tenant_id',
         'plant_id',

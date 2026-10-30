@@ -9,6 +9,13 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Supplier extends Model
 {
+    use \Illuminate\Database\Eloquent\Factories\HasFactory;
+
+    protected static function newFactory(): \Database\Factories\SupplierFactory
+    {
+        return \Database\Factories\SupplierFactory::new();
+    }
+
     protected $fillable = [
         'tenant_id',
         'plant_id',

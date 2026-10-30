@@ -8,6 +8,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ProductionLine extends Model
 {
+    use \Illuminate\Database\Eloquent\Factories\HasFactory;
+
+    protected static function newFactory(): \Database\Factories\ProductionLineFactory
+    {
+        return \Database\Factories\ProductionLineFactory::new();
+    }
+
     protected $fillable = [
         'tenant_id',
         'plant_id',

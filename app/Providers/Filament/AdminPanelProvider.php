@@ -30,10 +30,10 @@ class AdminPanelProvider extends PanelProvider
             ->favicon(asset('favicon.ico'))
             ->colors([
                 'primary' => Color::Amber,
-                'danger' => Color::Rose,
+                'danger'  => Color::Rose,
                 'success' => Color::Emerald,
                 'warning' => Color::Yellow,
-                'info' => Color::Sky,
+                'info'    => Color::Sky,
             ])
             ->default()
             ->id('admin')
@@ -69,18 +69,40 @@ class AdminPanelProvider extends PanelProvider
                 Authenticate::class,
             ])
             ->resources([
+                // Organization & Setup
                 \App\Filament\Resources\PlantResource::class,
                 \App\Filament\Resources\ProductionLineResource::class,
                 \App\Filament\Resources\SupplierResource::class,
+
+                // Master Data
+                \App\Filament\Resources\MaterialResource::class,
+                \App\Filament\Resources\ProductGradeResource::class,
+                \App\Filament\Resources\UnitResource::class,
+                \App\Filament\Resources\CostCategoryResource::class,
+
+                // Standards & Budgets
+                \App\Filament\Resources\StandardCostResource::class,
+                \App\Filament\Resources\BudgetResource::class,
+
+                // Operations
                 \App\Filament\Resources\ProductionBatchResource::class,
+                \App\Filament\Resources\DowntimeEventResource::class,
+                \App\Filament\Resources\BatchQualityResultResource::class,
                 \App\Filament\Resources\DailyProductionSummaryResource::class,
+
+                // Cost Management
                 \App\Filament\Resources\CostIncidentResource::class,
                 \App\Filament\Resources\CostPeriodResource::class,
+
+                // Monitoring
                 \App\Filament\Resources\AlertResource::class,
                 \App\Filament\Resources\AlertRuleResource::class,
             ])
             ->navigationGroups([
                 'Operations',
+                'Master Data',
+                'Standards & Budgets',
+                'Cost Management',
                 'Monitoring',
                 'Administration',
             ]);

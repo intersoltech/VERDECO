@@ -10,6 +10,13 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class CostIncident extends Model
 {
+    use \Illuminate\Database\Eloquent\Factories\HasFactory;
+
+    protected static function newFactory(): \Database\Factories\CostIncidentFactory
+    {
+        return \Database\Factories\CostIncidentFactory::new();
+    }
+
     protected $fillable = [
         'tenant_id',
         'plant_id',
@@ -38,6 +45,11 @@ class CostIncident extends Model
         'closed_at' => 'datetime',
         'reopened_at' => 'datetime',
     ];
+
+    public function line(): BelongsTo
+    {
+        return $this->belongsTo(\App\Domain\Production\Models\ProductionLine::class, 'line_id');
+    }
 
     public function plant(): BelongsTo
     {

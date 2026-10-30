@@ -8,6 +8,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ProductGrade extends Model
 {
+    use \Illuminate\Database\Eloquent\Factories\HasFactory;
+
+    protected static function newFactory(): \Database\Factories\ProductGradeFactory
+    {
+        return \Database\Factories\ProductGradeFactory::new();
+    }
+
     protected $fillable = [
         'tenant_id',
         'plant_id',

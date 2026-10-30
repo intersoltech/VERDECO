@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Domain\Alerts\Models\AlertRule;
+use App\Domain\Costing\Models\Budget;
 use App\Domain\Costing\Models\CostCategory;
 use App\Domain\Costing\Models\StandardCost;
 use App\Domain\Incidents\Models\CostIncident;
@@ -11,12 +12,18 @@ use App\Domain\MasterData\Models\Material;
 use App\Domain\MasterData\Models\MaterialPrice;
 use App\Domain\MasterData\Models\ProductGrade;
 use App\Domain\MasterData\Models\Supplier;
+use App\Domain\MasterData\Models\Unit;
 use App\Domain\Organization\Models\Organization;
 use App\Domain\Organization\Models\Plant;
+use App\Domain\Production\Models\DowntimeEvent;
+use App\Domain\Production\Models\ProductionBatch;
 use App\Domain\Production\Models\ProductionLine;
+use App\Domain\Quality\Models\BatchQualityResult;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 class VerdecoDemoSeeder extends Seeder
 {
@@ -335,6 +342,140 @@ class VerdecoDemoSeeder extends Seeder
                     'comparison_operator' => 'gt',
                     'cooldown_minutes' => 60,
                     'message_template' => '{plant_code} has {value} active incident(s) in daily costing mode.',
+                ]
+            );
+        }
+
+        // Units of Measure
+        $units = [
+            ['code' => 'kg', 'name' => 'Kilogram', 'type' => 'mass', 'conversion_to_base' => 1.0, 'symbol' => 'kg'],
+            ['code' => 'lb', 'name' => 'US Pound', 'type' => 'mass', 'conversion_to_base' => 0.45359237, 'symbol' => 'lb'],
+            ['code' => 'ton', 'name' => 'Metric Ton', 'type' => 'mass', 'conversion_to_base' => 1000.0, 'symbol' => 'MT'],
+            ['code' => 'kwh', 'name' => 'Kilowatt-Hour', 'type' => 'energy', 'conversion_to_base' => 1.0, 'symbol' => 'kWh'],
+            ['code' => 'mwh', 'name' => 'Megawatt-Hour', 'type' => 'energy', 'conversion_to_base' => 1000.0, 'symbol' => 'MWh'],
+            ['code' => 'hr', 'name' => 'Operating Hour', 'type' => 'time', 'conversion_to_base' => 1.0, 'symbol' => 'hr'],
+        ];
+
+        foreach ($units as $u) {
+            Unit::firstOrCreate(['code' => $u['code']], $u);
+        }
+
+        // Spatie Roles
+        $roles = ['admin', 'plant_manager', 'plant_supervisor', 'plant_operator'];
+        foreach ($roles as $r) {
+            Role::findOrCreate($r, 'web');
+        }
+
+        if (! $user->hasRole('admin')) {
+            $user->assignRole('admin');
+        }
+
+        // Monthly Budgets
+        $currentMonth = now()->startOfMonth()->toDateString();
+        foreach ($plantModels as $plant) {
+            Budget::firstOrCreate(
+                [
+                    'tenant_id' => $tenant->id,
+                    'plant_id' => $plant->id,
+                    'cost_category_id' => null,
+                    'period_month' => $currentMonth,
+                ],
+                [
+                    'tenant_id' => $tenant->id,
+                    'plant_id' => $plant->id,
+                    'cost_category_id' => null,
+                    'period_month' => $currentMonth,
+                    'budgeted_cost' => 185000.00,
+                    'budgeted_output_kg' => 250000.0,
+                    'budgeted_cost_per_kg' => 0.74,
+                    'notes' => 'Q4 Operating Budget Baseline',
+                ]
+            );
+        }
+
+        // Demo Production Batch & Quality Result
+        $vdcPlant = $plantModels['VDC'];
+        $vdcLine = ProductionLine::where('code', 'VDC-L01')->first();
+        $foodGrade = ProductGrade::where('code', 'FG-20-VDC')->first();
+
+        $demoBatch = ProductionBatch::firstOrCreate(
+            ['tenant_id' => $tenant->id, 'plant_id' => $vdcPlant->id, 'batch_number' => 'BATCH-VDC-202610-001'],
+            [
+                'tenant_id' => $tenant->id,
+                'plant_id' => $vdcPlant->id,
+                'line_id' => $vdcLine?->id,
+                'product_grade_id' => $foodGrade?->id,
+                'batch_number' => 'BATCH-VDC-202610-001',
+                'batch_date' => now()->toDateString(),
+                'status' => 'costed',
+                'input_kg' => 20000.00,
+                'good_output_kg' => 18600.00,
+                'recovery_credit' => 450.00,
+                'labor_regular_rate' => 32.00,
+                'labor_overtime_rate' => 48.00,
+                'labor_regular_hours' => 36.00,
+                'labor_overtime_hours' => 6.00,
+                'utility_kwh' => 7400.00,
+                'utility_rate' => 0.12,
+                'overhead_pool' => 3000.00,
+                'material_cost' => 13600.00,
+                'labor_cost' => 1440.00,
+                'utility_cost' => 888.00,
+                'overhead_cost' => 2976.00,
+                'incident_cost' => 250.00,
+                'total_cost' => 19154.00,
+                'net_cost' => 18704.00,
+                'yield_percent' => 93.00,
+                'cost_per_kg' => 1.005591,
+                'calculated_at' => now(),
+            ]
+        );
+
+        BatchQualityResult::firstOrCreate(
+            ['tenant_id' => $tenant->id, 'plant_id' => $vdcPlant->id, 'production_batch_id' => $demoBatch->id],
+            [
+                'tenant_id' => $tenant->id,
+                'plant_id' => $vdcPlant->id,
+                'production_batch_id' => $demoBatch->id,
+                'tested_at' => now(),
+                'sample_identifier' => 'SMP-VDC-001',
+                'intrinsic_viscosity' => 0.7850,
+                'acetaldehyde_ppm' => 1.7500,
+                'color_l' => 88.50,
+                'color_a' => -0.80,
+                'color_b' => 1.15,
+                'moisture_ppm' => 35.0,
+                'black_specks_count' => 1,
+                'fines_percent' => 0.08,
+                'status' => 'pass',
+                'inspector_notes' => 'Food Grade quality parameters verified.',
+                'inspected_by' => $user->id,
+            ]
+        );
+
+        // Demo Downtime Event
+        if ($vdcLine) {
+            DowntimeEvent::firstOrCreate(
+                [
+                    'tenant_id' => $tenant->id,
+                    'plant_id' => $vdcPlant->id,
+                    'line_id' => $vdcLine->id,
+                    'start_at' => now()->subHours(6)->startOfHour(),
+                ],
+                [
+                    'tenant_id' => $tenant->id,
+                    'plant_id' => $vdcPlant->id,
+                    'line_id' => $vdcLine->id,
+                    'cost_incident_id' => $incident->id ?? null,
+                    'downtime_type' => 'unplanned',
+                    'reason_code' => 'screen_pack_change',
+                    'start_at' => now()->subHours(6)->startOfHour(),
+                    'end_at' => now()->subHours(6)->startOfHour()->addMinutes(45),
+                    'duration_minutes' => 45,
+                    'lost_production_kg' => 1650.00,
+                    'description' => 'Melt pressure spike required unscheduled screen change.',
+                    'resolution_notes' => 'Replaced 40/80 mesh screens and recalibrated pressure transducer.',
+                    'reported_by' => $user->id,
                 ]
             );
         }

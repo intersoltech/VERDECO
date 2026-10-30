@@ -15,6 +15,13 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Plant extends Model
 {
+    use \Illuminate\Database\Eloquent\Factories\HasFactory;
+
+    protected static function newFactory(): \Database\Factories\PlantFactory
+    {
+        return \Database\Factories\PlantFactory::new();
+    }
+
     protected $fillable = [
         'tenant_id',
         'name',

@@ -13,6 +13,13 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Organization extends Model
 {
+    use \Illuminate\Database\Eloquent\Factories\HasFactory;
+
+    protected static function newFactory(): \Database\Factories\OrganizationFactory
+    {
+        return \Database\Factories\OrganizationFactory::new();
+    }
+
     protected $fillable = [
         'name',
         'slug',
